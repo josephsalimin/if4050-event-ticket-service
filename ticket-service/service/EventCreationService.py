@@ -10,8 +10,7 @@ import requests
 def validateEventDetail(event):
   return event.start_at < event.end_at
 
-
-def addEvent(event):
+def addEvent(event_url, event, auth_header):
   create_event_payload = {
       'name': event.name, 
       'partner_id':event.partner_id, 
@@ -19,12 +18,11 @@ def addEvent(event):
       'end_at': event.end_at, 
       'description': event.description, 
       'location': event.location}
-  create_event_resp = requests.post(url+'/event', json = create_event_payload)
+  create_event_resp = requests.post(event_url+'/event', json = create_event_payload, headers=auth_header)
   return create_event_resp
 
-
-def issueTicket(event_json):
-  event_id = create_event_json["id"]
+def issueTicket(ticket_url, event_json, section_list, auth_header):
+  event_id = event_json["id"]
   create_ticket_payload = {"event_id": event_id, "section_list": []}
 
   for section in section_list:
@@ -37,25 +35,27 @@ def issueTicket(event_json):
       })
 
   print("Section list: " , create_ticket_payload)
-  create_ticket_resp = requests.post(url+'/section', json = create_ticket_payload)
+  create_ticket_resp = requests.post(ticket_url+'/ticket_section', json = create_ticket_payload, headers=auth_header)
   return create_ticket_resp
 
 
 class EventCreationService(ServiceBase):
-  @rpc(Event, Iterable(Section), _returns=Event)
+  @rpc(Event, Iterable(Section), _returns=Boolean)
   def CreateEvent(ctx,event,section_list):
-    url = ctx.udc.ticket_url;
+    ticket_url = ctx.udc.ticket_url;
+    event_url = ctx.udc.event_url;
+    auth_header = {'Authorization': ctx.udc.token}
+
     if (not validateEventDetail(event)):
       return False
-    create_event_resp = addEvent(event)
+    create_event_resp = addEvent(event_url, event, auth_header)
     if (create_event_resp.ok):
       create_event_json = create_event_resp.json()
-      create_ticket_resp = issueTicket(create_event_json)
+      create_ticket_resp = issueTicket(ticket_url, create_event_json, section_list, auth_header)
       if (create_ticket_resp.ok):
         return True
       else:
         return False
-        
     else:
       return False
 

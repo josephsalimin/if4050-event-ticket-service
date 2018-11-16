@@ -13,7 +13,9 @@ config.read('config.ini')
 class ConfigContext(object):
     def __init__(self):
         self.ticket_url = config["TicketService"]["base_url"]
+        self.event_url = config["EventService"]["base_url"]
         self.payment_url = config["PaymentService"]["base_url"]
+        self.token = config["App"]["token"]
 
 
 def _on_method_call(ctx):
@@ -27,6 +29,6 @@ application = Application([EventCreationService], 'ticketx.test.soap',
 wsgi_application = WsgiApplication(application)
 
 if __name__ == '__main__':
-  print(config["Database"]["host"])
   server = make_server('127.0.0.1', 8000, wsgi_application)
+  print("Serving in 127.0.0.1:8000")
   server.serve_forever()
