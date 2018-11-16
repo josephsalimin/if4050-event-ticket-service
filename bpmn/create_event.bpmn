@@ -8,24 +8,20 @@
     <bpmn:messageFlow id="MessageFlow_1ic1rqm" sourceRef="Task_0jhxdtq" targetRef="Participant_1e3xikv" />
   </bpmn:collaboration>
   <bpmn:process id="create-event" name="Create Event" isExecutable="true">
-    <bpmn:sequenceFlow id="SequenceFlow_0d24ext" name="Validated" sourceRef="ExclusiveGateway_16dfcwp" targetRef="Task_0rbppsk">
+    <bpmn:sequenceFlow id="SequenceFlow_0d24ext" name="Valid" sourceRef="ExclusiveGateway_16dfcwp" targetRef="Task_0rbppsk">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${validated}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="SequenceFlow_0u3ufh9" sourceRef="Task_00m5xe1" targetRef="ExclusiveGateway_16dfcwp" />
     <bpmn:sequenceFlow id="SequenceFlow_0l39pl7" sourceRef="StartEvent_1" targetRef="Task_00m5xe1" />
-    <bpmn:exclusiveGateway id="ExclusiveGateway_16dfcwp">
+    <bpmn:exclusiveGateway id="ExclusiveGateway_16dfcwp" name="Validate">
       <bpmn:incoming>SequenceFlow_0u3ufh9</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0d24ext</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_1f9scpk</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Task_00m5xe1" name="Validate&#10;Event Detail" camunda:type="external" camunda:topic="validate-event-detail">
+    <bpmn:serviceTask id="Task_00m5xe1" name="Validate Partner and &#10;Event Detail" camunda:type="external" camunda:topic="validate-event-detail">
       <bpmn:incoming>SequenceFlow_0l39pl7</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0u3ufh9</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:startEvent id="StartEvent_1" name="Receive&#10;Input">
-      <bpmn:outgoing>SequenceFlow_0l39pl7</bpmn:outgoing>
-      <bpmn:messageEventDefinition messageRef="Message_13ljtcb" />
-    </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1f9scpk" name="Invalid" sourceRef="ExclusiveGateway_16dfcwp" targetRef="Task_034kmrh">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!validated}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -39,23 +35,18 @@
       <bpmn:incoming>SequenceFlow_03j7jvd</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_03j7jvd" sourceRef="Task_0jhxdtq" targetRef="EndEvent_04tgayf" />
-    <bpmn:sendTask id="Task_034kmrh" name="Notify&#10;Failed Event" camunda:expression="notify-failed-event">
+    <bpmn:sendTask id="Task_034kmrh" name="Notify&#10;Failed Event Creation" camunda:expression="notify-failed-event">
       <bpmn:incoming>SequenceFlow_1f9scpk</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1jbo1ro</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:dataStoreReference id="DataStoreReference_1xgrzv8" name="Ticket DB" />
-    <bpmn:dataStoreReference id="DataStoreReference_1d9maw3" name="Event DB" />
-    <bpmn:sendTask id="Task_0jhxdtq" name="Notify Partner" camunda:type="external" camunda:topic="notify-partner">
-      <bpmn:incoming>SequenceFlow_01giul7</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_03j7jvd</bpmn:outgoing>
-    </bpmn:sendTask>
-    <bpmn:serviceTask id="Task_0rbppsk" name="Add Event" camunda:type="external" camunda:topic="add-event">
+    <bpmn:serviceTask id="Task_0rbppsk" name="Create Event" camunda:type="external" camunda:topic="add-event">
       <bpmn:incoming>SequenceFlow_0d24ext</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_04x1v7m</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_13hbxz8">
         <bpmn:targetRef>DataStoreReference_1d9maw3</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_1d9maw3" name="Event DB" />
     <bpmn:serviceTask id="Task_1mypp0p" name="Issue Ticket" camunda:type="external" camunda:topic="issue-ticket">
       <bpmn:incoming>SequenceFlow_04x1v7m</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_01giul7</bpmn:outgoing>
@@ -63,6 +54,15 @@
         <bpmn:targetRef>DataStoreReference_1xgrzv8</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_1xgrzv8" name="Ticket DB" />
+    <bpmn:sendTask id="Task_0jhxdtq" name="Notify Event Created" camunda:type="external" camunda:topic="notify-partner">
+      <bpmn:incoming>SequenceFlow_01giul7</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_03j7jvd</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:startEvent id="StartEvent_1" name="Receive&#10;Input">
+      <bpmn:outgoing>SequenceFlow_0l39pl7</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_13ljtcb" />
+    </bpmn:startEvent>
   </bpmn:process>
   <bpmn:message id="Message_13ljtcb" name="receive-input" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -71,16 +71,16 @@
         <dc:Bounds x="123" y="-103" width="977" height="405" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="StartEvent_05odvz9_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <dc:Bounds x="194" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="171" y="145" width="40" height="27" />
+          <dc:Bounds x="192" y="145" width="40" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0iyabg4_di" bpmnElement="Task_00m5xe1">
         <dc:Bounds x="280" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0l39pl7_di" bpmnElement="SequenceFlow_0l39pl7">
-        <di:waypoint x="209" y="120" />
+        <di:waypoint x="230" y="120" />
         <di:waypoint x="280" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0u3ufh9_di" bpmnElement="SequenceFlow_0u3ufh9">
@@ -89,12 +89,15 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_16dfcwp_di" bpmnElement="ExclusiveGateway_16dfcwp" isMarkerVisible="true">
         <dc:Bounds x="420" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="426" y="152" width="39" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0d24ext_di" bpmnElement="SequenceFlow_0d24ext">
         <di:waypoint x="470" y="120" />
-        <di:waypoint x="572" y="120" />
+        <di:waypoint x="538" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="499" y="97" width="45" height="14" />
+          <dc:Bounds x="493" y="97" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1f9scpk_di" bpmnElement="SequenceFlow_1f9scpk">
@@ -116,12 +119,12 @@
         <di:waypoint x="675" y="-3" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_04x1v7m_di" bpmnElement="SequenceFlow_04x1v7m">
-        <di:waypoint x="672" y="120" />
-        <di:waypoint x="713" y="120" />
+        <di:waypoint x="638" y="120" />
+        <di:waypoint x="686" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_01giul7_di" bpmnElement="SequenceFlow_01giul7">
-        <di:waypoint x="813" y="120" />
-        <di:waypoint x="856" y="120" />
+        <di:waypoint x="786" y="120" />
+        <di:waypoint x="833" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_04tgayf_di" bpmnElement="EndEvent_04tgayf">
         <dc:Bounds x="1014" y="102" width="36" height="36" />
@@ -130,55 +133,55 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_03j7jvd_di" bpmnElement="SequenceFlow_03j7jvd">
-        <di:waypoint x="956" y="120" />
+        <di:waypoint x="933" y="120" />
         <di:waypoint x="1014" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="DataStoreReference_1d9maw3_di" bpmnElement="DataStoreReference_1d9maw3">
-        <dc:Bounds x="597" y="198" width="50" height="50" />
+        <dc:Bounds x="563" y="198" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="599" y="255" width="47" height="14" />
+          <dc:Bounds x="565" y="255" width="47" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_13hbxz8_di" bpmnElement="DataOutputAssociation_13hbxz8">
-        <di:waypoint x="622" y="160" />
-        <di:waypoint x="622" y="198" />
+        <di:waypoint x="588" y="160" />
+        <di:waypoint x="588" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="DataStoreReference_1xgrzv8_di" bpmnElement="DataStoreReference_1xgrzv8">
-        <dc:Bounds x="738" y="198" width="50" height="50" />
+        <dc:Bounds x="711" y="198" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="740" y="255" width="47" height="14" />
+          <dc:Bounds x="713" y="255" width="47" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_01nwief_di" bpmnElement="DataOutputAssociation_01nwief">
-        <di:waypoint x="763" y="160" />
-        <di:waypoint x="763" y="198" />
+        <di:waypoint x="736" y="160" />
+        <di:waypoint x="736" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Participant_1plhh78_di" bpmnElement="Participant_1e3xikv">
         <dc:Bounds x="124" y="-208" width="977" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="MessageFlow_0p7ogsy_di" bpmnElement="MessageFlow_0p7ogsy">
-        <di:waypoint x="191" y="-148" />
-        <di:waypoint x="191" y="102" />
+        <di:waypoint x="212" y="-148" />
+        <di:waypoint x="212" y="102" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="SendTask_0ikw7wq_di" bpmnElement="Task_034kmrh">
         <dc:Bounds x="508" y="-43" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SendTask_19t67br_di" bpmnElement="Task_0jhxdtq">
-        <dc:Bounds x="856" y="80" width="100" height="80" />
+        <dc:Bounds x="833" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="MessageFlow_1lups5n_di" bpmnElement="MessageFlow_1lups5n">
         <di:waypoint x="576" y="-43" />
         <di:waypoint x="576" y="-148" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="MessageFlow_1ic1rqm_di" bpmnElement="MessageFlow_1ic1rqm">
-        <di:waypoint x="925" y="80" />
-        <di:waypoint x="925" y="-148" />
+        <di:waypoint x="883" y="74" />
+        <di:waypoint x="883" y="-144" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_0txl5il_di" bpmnElement="Task_0rbppsk">
-        <dc:Bounds x="572" y="80" width="100" height="80" />
+        <dc:Bounds x="538" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0dvnk7t_di" bpmnElement="Task_1mypp0p">
-        <dc:Bounds x="713" y="80" width="100" height="80" />
+        <dc:Bounds x="686" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
