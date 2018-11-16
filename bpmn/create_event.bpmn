@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0j3whrw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
   <bpmn:collaboration id="Collaboration_1ejxj6d">
-    <bpmn:participant id="Participant_0nptm15" name="Event Creation" processRef="event-service" />
+    <bpmn:participant id="Participant_0nptm15" name="Create Event" processRef="create-event" />
     <bpmn:participant id="Participant_1e3xikv" name="Partner" />
     <bpmn:messageFlow id="MessageFlow_0p7ogsy" sourceRef="Participant_1e3xikv" targetRef="StartEvent_1" />
     <bpmn:messageFlow id="MessageFlow_1lups5n" sourceRef="Task_034kmrh" targetRef="Participant_1e3xikv" />
     <bpmn:messageFlow id="MessageFlow_1ic1rqm" sourceRef="Task_0jhxdtq" targetRef="Participant_1e3xikv" />
   </bpmn:collaboration>
-  <bpmn:process id="event-service" name="Event Creation" isExecutable="true">
+  <bpmn:process id="create-event" name="Create Event" isExecutable="true">
     <bpmn:sequenceFlow id="SequenceFlow_0d24ext" name="Validated" sourceRef="ExclusiveGateway_16dfcwp" targetRef="Task_0rbppsk">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${validated}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -64,7 +64,7 @@
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
   </bpmn:process>
-  <bpmn:message id="Message_13ljtcb" name="Message_0gq9adc" />
+  <bpmn:message id="Message_13ljtcb" name="receive-input" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1ejxj6d">
       <bpmndi:BPMNShape id="Participant_0nptm15_di" bpmnElement="Participant_0nptm15">
@@ -94,7 +94,7 @@
         <di:waypoint x="470" y="120" />
         <di:waypoint x="572" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="499" y="102" width="45" height="14" />
+          <dc:Bounds x="499" y="97" width="45" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1f9scpk_di" bpmnElement="SequenceFlow_1f9scpk">

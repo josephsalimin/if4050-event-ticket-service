@@ -15,38 +15,7 @@ camundaClient.subscribe('validate-event-detail', async function({ task, taskServ
 	let processVariables = new Variables();
 	processVariables.set("validated", true);
 
-	console.log(`Did validate-request. Set variable validated=${true}`);
-
-	soap.createClient(wsdl_url, (err, client) => {
-		let args = {
-		"event": {
-			"id": 1,
-			"name": "Biji",
-			"location": "Jakarta",
-			"partner_id": 1,
-			"start_at": 2,
-			"end_at": 3,
-			"description": "Festival Biji Jakarta"
-		},
-			"section_list": []
-		};
-		let section = {
-			"Section": {
-				"id": 1,
-				"name": "Hehe",
-				"event_id": 1,
-				"capacity": 100,
-				"price": 500000,
-				"has_seat": true
-			}
-		};
-		args.section_list.push(section);
-		console.log(args);
-
-		client.CreateEvent(args, function(err, result) {
-			console.log(result.CreateEventResult);
-		});
-    });
+	console.log(`Did validate-event-detail. Set variable validated=${true}`);
 
     // Complete the task
     await taskService.complete(task, processVariables);
@@ -54,13 +23,20 @@ camundaClient.subscribe('validate-event-detail', async function({ task, taskServ
 
 camundaClient.subscribe('add-event', async function({ task, taskService }) {
 	console.log(`Did add-event`);
-
-	//console.log(`Set process variables with amount $${amount} and item ${item}`);
-
 	// Complete the task
 	await taskService.complete(task);
 });
 
-// camundaClient.start();
-// var exports = module.exports = {};
-// exports.camundaClient = camundaClient;
+camundaClient.subscribe('issue-ticket', async function({ task, taskService }) {
+	console.log(`Did issue-ticket`);
+	// Complete the task
+	await taskService.complete(task);
+});
+
+camundaClient.subscribe('notify-partner', async function({ task, taskService }) {
+	console.log(`Did notify-partner`);
+	// Complete the task
+	await taskService.complete(task);
+});
+
+camundaClient.start();

@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "soap": "^0.25.0"
+    "soap": "^0.25.0",
+    "soap-server": "^0.1.0"
   },
   "devDependencies": {
     "camunda-external-task-client-js": "^1.0.0"
