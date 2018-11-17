@@ -1,6 +1,7 @@
 let axios = require('axios');
 let baseUrl = 'http://localhost:8080/engine-rest';
 let eventUrl = 'https://eec62d48.ngrok.io';
+let ticketUrl = 'https://fc9923a1.ngrok.io';
 let jwtKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicGFydG5lcl9pZCI6MCwibmFtZSI6InRpY2tldHgiLCJhdXRoX3R5cGUiOiJtYXN0ZXIiLCJ0aW1lc3RhbXAiOjE1NDIzNTg2MDkzNjQuOTc3OH0.5xFtVgMrDiXR3gDUseLUkr5VMWwInmL_xZ4XUiW9_zU';
 let { Client, logger, Variables } = require('camunda-external-task-client-js');
 
@@ -12,11 +13,29 @@ axios.defaults.headers.common['Authorization'] = jwtKey;
 // Set event data to be created
 let data = {
 	partner_id: 1,
-	name: 'Festival Jajanan Bango',
+	name: 'Festival Jajanan Kuda',
 	location: 'Istora Senayan',
 	start_at: 1,
 	end_at: 2
 };
+let tickets = {
+	event_id: -1,
+	section_list: [
+		{
+			name: "Big",
+			price: 9999,
+			capacity: 9999,
+			has_seat: false
+		},
+		{
+			name: "Small",
+			price: 222,
+			capacity: 22,
+			has_seat: false
+		}
+	]
+}
+let event_id;
 
 camundaClient.subscribe('validate-event-detail', async function({ task, taskService }) {
 	let processVariables = new Variables();
@@ -41,6 +60,7 @@ camundaClient.subscribe('add-event', async function({ task, taskService }) {
 	let response;
 	try {
 		response = await axios.post(eventUrl+'/event', data);
+		event_id = response.data.id;
 	} catch(err) {
 		throw err;
 	}
@@ -49,12 +69,24 @@ camundaClient.subscribe('add-event', async function({ task, taskService }) {
 });
 
 camundaClient.subscribe('issue-ticket', async function({ task, taskService }) {
+	let response;
+	try {
+		tickets.event_id = event_id;
+		response = await axios.post(ticketUrl+'/ticket_section', tickets);
+	} catch(err) {
+		throw err;
+	}
 	console.log(`Did issue-ticket`);
 	await taskService.complete(task);
 });
 
 camundaClient.subscribe('notify-partner', async function({ task, taskService }) {
 	console.log(`Did notify-partner`);
+	await taskService.complete(task);
+});
+
+camundaClient.subscribe('notify-failed-event', async function({ task, taskService }) {
+	console.log(`Did notify-failed-event`);
 	await taskService.complete(task);
 });
 

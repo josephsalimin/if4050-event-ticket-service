@@ -51,7 +51,7 @@
       <bpmn:outgoing>SequenceFlow_0l39pl7</bpmn:outgoing>
       <bpmn:messageEventDefinition messageRef="Message_13ljtcb" />
     </bpmn:startEvent>
-    <bpmn:sendTask id="Task_034kmrh" name="Notify&#10;Failed Event Creation" camunda:expression="notify-failed-event">
+    <bpmn:sendTask id="Task_034kmrh" name="Notify&#10;Failed Event Creation" camunda:type="external" camunda:topic="notify-failed-event">
       <bpmn:incoming>SequenceFlow_1f9scpk</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1jbo1ro</bpmn:outgoing>
     </bpmn:sendTask>
