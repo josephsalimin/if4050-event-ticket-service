@@ -6,14 +6,14 @@
     <bpmn:participant id="Participant_1hzv68c" name="Payment Gateway" />
     <bpmn:messageFlow id="MessageFlow_1n09m7n" sourceRef="SendTask_1plem9n" targetRef="Participant_12upb4w" />
     <bpmn:messageFlow id="MessageFlow_0hf9q5p" sourceRef="Participant_12upb4w" targetRef="StartEvent_0y8dhav" />
-    <bpmn:messageFlow id="MessageFlow_0a3itjy" sourceRef="SendTask_0d6p5j0" targetRef="Participant_1hzv68c" />
-    <bpmn:messageFlow id="MessageFlow_05mg77a" sourceRef="Participant_1hzv68c" targetRef="IntermediateThrowEvent_088pdnk" />
     <bpmn:messageFlow id="MessageFlow_00kafk2" sourceRef="Task_11brdu4" targetRef="Participant_12upb4w" />
   </bpmn:collaboration>
   <bpmn:process id="booking-service" name="Book Event" isExecutable="true">
     <bpmn:laneSet id="LaneSet_1alf1dg" />
     <bpmn:sequenceFlow id="SequenceFlow_0p685cx" sourceRef="Task_11brdu4" targetRef="EndEvent_00xzohf" />
-    <bpmn:sequenceFlow id="SequenceFlow_1uf768t" sourceRef="ExclusiveGateway_0w8b9dg" targetRef="Task_11brdu4" />
+    <bpmn:sequenceFlow id="SequenceFlow_1uf768t" sourceRef="ExclusiveGateway_0w8b9dg" targetRef="Task_11brdu4">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${invoiceCreated}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="SequenceFlow_166cx6q" sourceRef="IntermediateThrowEvent_088pdnk" targetRef="ExclusiveGateway_0w8b9dg" />
     <bpmn:sequenceFlow id="SequenceFlow_1gfi1gt" name="Invoice Failed" sourceRef="ExclusiveGateway_0w8b9dg" targetRef="SendTask_1plem9n">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!invoiceCreated}</bpmn:conditionExpression>
@@ -35,7 +35,7 @@
     <bpmn:endEvent id="EndEvent_00xzohf" name="Booking Success">
       <bpmn:incoming>SequenceFlow_0p685cx</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sendTask id="Task_11brdu4" name="Show Invoice Detail">
+    <bpmn:sendTask id="Task_11brdu4" name="Show Invoice Detail" camunda:type="external" camunda:topic="show-invoice-detail">
       <bpmn:incoming>SequenceFlow_1uf768t</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0p685cx</bpmn:outgoing>
     </bpmn:sendTask>
@@ -66,7 +66,7 @@
     <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_088pdnk" name="Invoice Respond">
       <bpmn:incoming>SequenceFlow_1srjoeo</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_166cx6q</bpmn:outgoing>
-      <bpmn:messageEventDefinition />
+      <bpmn:messageEventDefinition messageRef="Message_1sxhtgo" />
     </bpmn:intermediateCatchEvent>
     <bpmn:exclusiveGateway id="ExclusiveGateway_0w8b9dg" name="Invoice Creation Validation">
       <bpmn:incoming>SequenceFlow_166cx6q</bpmn:incoming>
@@ -102,6 +102,7 @@
   <bpmn:message id="Message_0vevqo5" name="receive-invoice-respond" />
   <bpmn:message id="Message_1prv7ul" name="payment-success-notification" />
   <bpmn:message id="Message_05iz3fu" name="event-booking-request" />
+  <bpmn:message id="Message_1sxhtgo" name="invoice-respond" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0ynv6lv">
       <bpmndi:BPMNShape id="Participant_12upb4w_di" bpmnElement="Participant_12upb4w">
@@ -243,10 +244,6 @@
       <bpmndi:BPMNShape id="SendTask_1cma0d7_di" bpmnElement="SendTask_0d6p5j0">
         <dc:Bounds x="1034" y="1490" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="MessageFlow_0a3itjy_di" bpmnElement="MessageFlow_0a3itjy">
-        <di:waypoint x="1087" y="1570" />
-        <di:waypoint x="1087" y="1739" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="IntermediateCatchEvent_1jz5u9s_di" bpmnElement="IntermediateThrowEvent_088pdnk">
         <dc:Bounds x="1173" y="1512" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -256,10 +253,6 @@
       <bpmndi:BPMNEdge id="SequenceFlow_166cx6q_di" bpmnElement="SequenceFlow_166cx6q">
         <di:waypoint x="1209" y="1530" />
         <di:waypoint x="1247" y="1530" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="MessageFlow_05mg77a_di" bpmnElement="MessageFlow_05mg77a">
-        <di:waypoint x="1191" y="1735" />
-        <di:waypoint x="1191" y="1548" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1uf768t_di" bpmnElement="SequenceFlow_1uf768t">
         <di:waypoint x="1297" y="1530" />

@@ -1,5 +1,7 @@
+let axios = require('axios');
 let { Client, logger, Variables } = require('camunda-external-task-client-js');
-let config = { baseUrl: 'http://localhost:8080/engine-rest' };
+let baseUrl = 'http://localhost:8080/engine-rest';
+let config = { baseUrl };
 
 // create a Client instance with custom configuration
 let client = new Client(config);
@@ -49,11 +51,31 @@ client.subscribe('send-invoice-request', async function({ task, taskService }) {
     let processVariables = new Variables();
     processVariables.set("invoiceCreated", true);
 
-	console.log(`Did send-invoice-request. Set variable invoice_created=${true}`);
-	// Complete the task
+	console.log(`Did send-invoice-request with id ${task.id}. Set variable invoice_created=${true}`);
+	// console.log(task.id);
+	// try {
+	// 	await axios.post(baseUrl+'/message', {
+	// 		'messageName': 'invoice-respond',
+	// 		'processInstanceId': task.id
+	// 	})
+	// 	.then((response) => {
+	// 		console.log(response);
+	// 	})
+	// } catch(err) {
+	// 	throw err;
+	// }
+
 	await taskService.complete(task, processVariables);
 });
 
-// console.log(client);
+client.subscribe('show-invoice-detail', async function({ task, taskService }) {
+    // let processVariables = new Variables();
+    // processVariables.set("invoiceCreated", true);
+	console.log(`show-invoice-detail`);
+	// Complete the task
+	await taskService.complete(task);
+});
+
+console.log(client);
 
 client.start();

@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "soap": "^0.25.0",
     "soap-server": "^0.1.0"
   },
