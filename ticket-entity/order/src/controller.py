@@ -1,10 +1,15 @@
 from app_exception import ApplicationException
 from .models import Order, ReservedTicket
-import os
-import requests
 
 
 def create_order(user_id, total_price, list_ticket_section):
+    '''
+    Function to create order
+    :param user_id: int
+    :param total_price: int
+    :param list_ticket_section: array of dict
+    :return: dict
+    '''
     order = Order(user_id=user_id, total_price=total_price, status="pending")
     reserveds = []
     for section_ticket in list_ticket_section:
@@ -17,6 +22,11 @@ def create_order(user_id, total_price, list_ticket_section):
 
 
 def pay_order(order_id):
+    '''
+    Function to pay order from order_id
+    :param order_id: int
+    :return: array of dict
+    '''
     order = Order.get_or_none(Order.id == order_id)
     if order is None:
         raise ApplicationException("Order not found")
@@ -33,6 +43,11 @@ def pay_order(order_id):
 
 
 def cancel_order(order_id):
+    '''
+    Function to cancel order from order_id
+    :param order_id: int
+    :return: array of dict
+    '''
     order = Order.get_or_none(Order.id == order_id)
     if order is None:
         raise ApplicationException("Order not found")
@@ -49,6 +64,11 @@ def cancel_order(order_id):
 
 
 def get_order(order_id):
+    '''
+    Function to get order detail from order_id
+    :param order_id: int
+    :return: dict
+    '''
     order = Order.get_or_none(Order.id == order_id)
     if order is None:
         raise ApplicationException("Order not found")
@@ -59,6 +79,11 @@ def get_order(order_id):
 
 
 def get_order_by_user(user_id):
-    orders = order.select().where(Order.user_id == user_id)
+    '''
+    Function to get order from user
+    :param user_id: int
+    :return: array of dict
+    '''
+    orders = Order.select().where(Order.user_id == user_id)
     resp = [order.to_dict() for order in orders]
     return resp

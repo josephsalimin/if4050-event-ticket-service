@@ -6,6 +6,13 @@ import time
 
 
 def create_auth_service(name, auth_type, partner_id=0):
+    '''
+    Function to create Auth Service before using other REST Service
+    :param name: string
+    :param auth_type: string
+    :param partner_id: int or string
+    :return: dict
+    '''
     auth_service = AuthService.get_or_none(AuthService.name == name)
     if auth_service is not None:
         raise ApplicationException("Auth user already exist")
@@ -32,6 +39,12 @@ def create_auth_service(name, auth_type, partner_id=0):
 
 
 def refresh_auth_token(name, refresh_token):
+    '''
+    Function to refresh authentication token
+    :param name: string
+    :param refresh_token: string
+    :return: dict
+    '''
     try:
         decode = jwt.decode(refresh_token, os.environ.get("REFRESH_KEY"), algorithms='HS256')
     except jwt.InvalidTokenError:
@@ -58,6 +71,11 @@ def refresh_auth_token(name, refresh_token):
 
 
 def verify_auth(auth_token):
+    '''
+    Function to verify authentication token
+    :param auth_token: string
+    :return: dict
+    '''
     try:
         decode = jwt.decode(auth_token, os.environ.get("AUTH_KEY"), algorithms='HS256')
     except jwt.InvalidTokenError:
@@ -76,6 +94,11 @@ def verify_auth(auth_token):
 
 
 def get_auth(auth_id):
+    '''
+    Function to get auth info
+    :param auth_id:
+    :return: dict
+    '''
     auth_service = AuthService.get_or_none(AuthService.id == auth_id)
     if auth_service is None:
         raise ApplicationException("Auth not exist")

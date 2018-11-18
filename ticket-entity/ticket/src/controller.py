@@ -1,11 +1,14 @@
-from flask import g
 from app_exception import ApplicationException
 from .models import Ticket, Section, DoesNotExist, IntegrityError
-import requests
-import os
 
 
 def issue_ticket(event_id, list_ticket_section):
+    '''
+    Function to issue ticket section
+    :param event_id: int
+    :param list_ticket_section: array of dict
+    :return: boolean
+    '''
     sections = []
     for ticket_section in list_ticket_section:
         try:
@@ -20,6 +23,15 @@ def issue_ticket(event_id, list_ticket_section):
 
 
 def create_ticket_section(has_seat, event_id, name, price, capacity):
+    '''
+    Function to create ticket section
+    :param has_seat: boolean
+    :param event_id: int
+    :param name: string
+    :param price: int
+    :param capacity: int
+    :return: array of Section
+    '''
     sections = []
     if has_seat:
         for i in range(capacity):
@@ -35,15 +47,21 @@ def create_ticket_section(has_seat, event_id, name, price, capacity):
 
 
 def get_section_by_event(event_id):
+    '''
+    Function to get Section from event
+    :param event_id: int
+    :return: array of dict
+    '''
     sections = Section.select().where(Section.event_id == event_id)
-    response = {
-        "event": event.to_dict(),
-        "list_section": [section.to_dict() for section in sections]
-    }
-    return response
+    return [section.to_dict() for section in sections]
 
 
 def get_section_detail(section_id):
+    '''
+    Function to get section detail
+    :param section_id: int
+    :return: dict
+    '''
     section = Section.get_or_none(Section.id == section_id)
     if section is None:
         raise ApplicationException("Section not exist")
@@ -51,6 +69,12 @@ def get_section_detail(section_id):
 
 
 def change_section_capacity(list_ticket_section, change_type):
+    '''
+    Function to change section capacity
+    :param list_ticket_section: array of dict
+    :param change_type: string
+    :return: boolean
+    '''
     sections = []
     for ticket_section in list_ticket_section:
         section = Section.get_or_none(Section.id == ticket_section["id"])
@@ -67,6 +91,11 @@ def change_section_capacity(list_ticket_section, change_type):
 
 
 def validate_ticket_section(list_ticket_section):
+    '''
+    Function to validate ticket section
+    :param list_ticket_section: array of dict
+    :return: boolean
+    '''
     for ticket_section in list_ticket_section:
         section = Section.get_or_none(Section.id == ticket_section["id"])
         if section is None or section.quantity <= ticket_section["quantity"]:
@@ -75,6 +104,11 @@ def validate_ticket_section(list_ticket_section):
 
 
 def get_ticket_detail(ticket_id):
+    '''
+    Function to get ticket detail
+    :param ticket_id: int
+    :return: dict
+    '''
     ticket = Ticket.get_or_none(Ticket.id == ticket_id)
     if ticket is None:
         raise ApplicationException("Ticket not exist")
@@ -82,13 +116,23 @@ def get_ticket_detail(ticket_id):
 
 
 def get_ticket_by_order(order_id):
-    order = get_order(order_id)
+    '''
+    Function to get ticket from order_id
+    :param order_id: int
+    :return: array of dict
+    '''
     tickets = Ticket.select().where(Ticket.order_id == order_id)
     resp = [ticket.to_dict() for ticket in tickets]
     return resp
 
 
 def generate_ticket(order_id, list_ticket_section):
+    '''
+    Function to generate ticket after pay book
+    :param order_id: int
+    :param list_ticket_section: array of dict
+    :return: array of dict
+    '''
     tickets, resp = [], []
     for ticket_section in list_ticket_section:
         id_section, quantity = ticket_section.get("id", 0), ticket_section.get("quantity", 0)
@@ -105,6 +149,11 @@ def generate_ticket(order_id, list_ticket_section):
 
 
 def remove_ticket(order_id):
+    '''
+    Function to delete ticket from order
+    :param order_id: id
+    :return: boolean
+    '''
     tickets = Ticket.select().where(Ticket.order_id == order_id)
     for ticket in tickets:
         ticket.delete_instance()

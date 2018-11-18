@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from .controller import *
 
 
+# Blue print for Auth
 auth = Blueprint("auth_controller", __name__, template_folder="templates")
 
 
@@ -19,9 +20,9 @@ def create():
 def update():
     name = request.json.get("name", "").strip()
     refresh_token = request.json.get("refresh_token", "").strip()
-    if username == "" or refresh_token == "":
+    if name == "" or refresh_token == "":
         raise ApplicationException("Input error")
-    return jsonify(refresh_auth_token(username, refresh_token))
+    return jsonify(refresh_auth_token(name, refresh_token))
 
 
 @auth.route("/verify", methods=["POST"])
@@ -30,6 +31,7 @@ def verify():
     if auth_token == "":
         raise ApplicationException("Input error")
     return jsonify(verify_auth(auth_token))
+
 
 @auth.route("/<auth_id>", methods=["GET"])
 def read(auth_id):
