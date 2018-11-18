@@ -25,7 +25,7 @@ def before_request():
         raise ApplicationException("Must be JSON type")
     # Validate for Authorization
     jwt_token = request.headers.get('Authorization')
-    if auth is None:
+    if jwt_token is None:
         raise ApplicationException("Not authorized")
     r = requests.post(os.environ.get("AUTH_URL"), json={"auth_token": jwt_token})
     if r.status_code != 200 or not r.json()["valid"]:
@@ -44,7 +44,7 @@ def after_request(response):
     return response
 
 
-@app.errorhandler(UserException)
+@app.errorhandler(ApplicationException)
 def error_auth_exception(error):
     payload = {"message": str(error)}
     return jsonify(payload), error.status_code

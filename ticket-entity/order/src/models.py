@@ -32,10 +32,10 @@ class Order(BaseModel):
 class ReservedTicket(BaseModel):
     section_id = IntegerField(null=False)
     quantity = IntegerField(null=False)
-    order_id = IntegerField(null=False)
+    order = ForeignKeyField(Order, null=False)
 
     def to_dict(self):
-        return model_to_dict(self, recurse=True)
+        return model_to_dict(self, recurse=False)
     
     class Meta:
         table_name = "reserved_tickets"

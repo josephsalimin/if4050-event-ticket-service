@@ -50,26 +50,16 @@ def get_section_detail(section_id):
     return section.to_dict()
 
 
-def reduce_section_quantity(list_ticket_section):
+def change_section_capacity(list_ticket_section, change_type):
     sections = []
     for ticket_section in list_ticket_section:
         section = Section.get_or_none(Section.id == ticket_section["id"])
         if section is None:
-            raise ApplicationException("Section not exist")
-        section.quantity -= int(ticket_section["quantity"])
-        sections.append(section)
-    for section in sections:
-        section.save()
-    return True
-
-
-def add_section_quantity(list_ticket_section):
-    sections = []
-    for ticket_section in list_ticket_section:
-        section = Section.get_or_none(Section.id == ticket_section["id"])
-        if section is None:
-            raise ApplicationException("Section not exist")
-        section.quantity += int(ticket_section["quantity"])
+            return False
+        if change_type == 'reduce':
+            section.current_capacity -= int(ticket_section["quantity"])
+        elif change_type == 'add':
+            section.current_capacity += int(ticket_section["quantity"])
         sections.append(section)
     for section in sections:
         section.save()

@@ -4,9 +4,15 @@ import os
 import requests
 
 
-def create_order(user_id, total_price):
+def create_order(user_id, total_price, list_ticket_section):
     order = Order(user_id=user_id, total_price=total_price, status="pending")
+    reserveds = []
+    for section_ticket in list_ticket_section:
+        reserved = ReservedTicket(section_id=section_ticket["id"], quantity=section_ticket["quantity"], order=order)
+        reserveds.append(reserved)
     order.save()
+    for reserved in reserveds:
+        reserved.save()
     return order.to_dict()
 
 
@@ -14,10 +20,10 @@ def pay_order(order_id):
     order = Order.get_or_none(Order.id == order_id)
     if order is None:
         raise ApplicationException("Order not found")
-    if order.status == "cancelled":
-        raise ApplicationException("Order already cancelled")
+    if order.status == "cancelled" or order.status == "paid":
+        return []
     order.status = "paid"
-    reserveds = ReservedTicket.select().where(ReservedTicket.order_id == order_id)
+    reserveds = ReservedTicket.select().where(ReservedTicket.order == order)
     section_list = [{
         "id": reserved.section_id,
         "quantity": reserved.quantity 
@@ -31,9 +37,9 @@ def cancel_order(order_id):
     if order is None:
         raise ApplicationException("Order not found")
     if order.status == "cancelled":
-        raise ApplicationException("Order already cancelled")
+        return []
     order.status = "cancelled"
-    reserveds = ReservedTicket.select().where(ReservedTicket.order_id == order_id)
+    reserveds = ReservedTicket.select().where(ReservedTicket.order == order)
     section_list = [{
         "id": reserved.section_id,
         "quantity": reserved.quantity 
@@ -46,4 +52,13 @@ def get_order(order_id):
     order = Order.get_or_none(Order.id == order_id)
     if order is None:
         raise ApplicationException("Order not found")
-    return order.to_dict()
+    reserveds = ReservedTicket.select().where(ReservedTicket.order == order)
+    resp = order.to_dict()
+    resp["section_list"] = [reserved.to_dict() for reserved in reserveds]
+    return resp
+
+
+def get_order_by_user(user_id):
+    orders = order.select().where(Order.user_id == user_id)
+    resp = [order.to_dict() for order in orders]
+    return resp
