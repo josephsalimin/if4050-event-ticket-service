@@ -57,7 +57,7 @@
 }
 ```
 
-#### /user/<partner_id>
+#### /partner/<partner_id>
 - Method: PUT
 - Body
 ```json5
