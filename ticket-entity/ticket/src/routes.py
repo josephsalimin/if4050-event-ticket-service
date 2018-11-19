@@ -48,7 +48,7 @@ def read_section(section_id):
     return jsonify(get_section_detail(section_id))
 
 
-@ticket_section.route("/reduce", methods=["POST"])
+@ticket_section.route("/capacity_reduce", methods=["POST"])
 def reduce_capacity():
     try:
         list_ticket_section = request.json["section_list"]
@@ -57,7 +57,7 @@ def reduce_capacity():
         raise ApplicationException("Wrong input")
 
 
-@ticket_section.route("/add", methods=["POST"])
+@ticket_section.route("/capacity_add", methods=["POST"])
 def add_capacity():
     try:
         list_ticket_section = request.json["section_list"]
@@ -78,7 +78,8 @@ def generate_ticket_from_order():
     return jsonify(generate_ticket(order_id, list_ticket_section))
 
 
-@ticket.route("/remove", methods=["DELETE"])
+@ticket.route("/", methods=["DELETE"])
+@ticket.route("", methods=["DELETE"])
 def remove_ticket_from_order():
     body = request.json
     try:

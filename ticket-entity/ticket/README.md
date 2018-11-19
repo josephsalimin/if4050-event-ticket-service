@@ -75,7 +75,7 @@ true
 }
 ```
 
-#### /ticket_section/reduce
+#### /ticket_section/capacity_reduce
 - Method: POST
 - Input
 ```json5
@@ -94,7 +94,7 @@ true
 true
 ```
 
-#### /ticket_section/add
+#### /ticket_section/capacity_add
 - Method: POST
 - Input
 ```json5
@@ -141,7 +141,7 @@ true
 ]
 ```
 
-#### /ticket/remove
+#### /ticket/
 - Method: DELETE
 - Input
 ```json5
