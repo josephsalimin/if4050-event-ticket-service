@@ -34,28 +34,24 @@
 - Method: PUT
 - Output
 ```json5
-{
-  "section_list": [
-    {
-      "id": "section_id",
-      "quantity": "ticket_quantity"
-    }
-  ]
-}
+[
+  {
+    "id": "section_id",
+    "quantity": "ticket_quantity"
+  }
+]
 ```
 
 #### /order/<order_id>
 - Method: DELETE
 - Output
 ```json5
-{
-  "section_list": [
-    {
-      "id": "section_id",
-      "quantity": "ticket_quantity"
-    }
-  ]
-}
+[
+  {
+    "id": "section_id",
+    "quantity": "ticket_quantity"
+  }
+]
 ```
 
 #### /order/<order_id>
