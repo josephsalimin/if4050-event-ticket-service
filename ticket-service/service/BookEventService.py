@@ -34,17 +34,13 @@ def createOrder(ticket_url, user_id, price):
 def reserveTicket(ticket_url, order_id, orderline_list):
   reserve_ticket_payload = {'order_id': order_json["id"], 'section_list': orderline_list}
   reserve_ticket_resp = requests.post(ticket_url+'/invoice', json=create_invoice_payload)
-  return reserve_ticket_resp
-
-def createInvoice(payment_url, user_id, price):
-  create_invoice_payload = {'user_id': user_id, 'price':price}
-  create_invoice_resp = requests.post(payment_url+'/invoice', json=create_invoice_payload)    
+  return reserve_ticket_resp    
 
 class BookEventService(ServiceBase):
-  @rpc(Integer, Iterable(Orderline), _returns=Boolean)
+  @rpc(Integer, Iterable(Orderline), _returns=Iterable(Orderline))
   def BookEvent(ctx,user_id, orderline_list):
-    ticket_url = ctx.ticket_url
-    payment_url = ctx.payment_url
+    ticket_url = ctx.udc.ticket_url
+    payment_url = ctx.udc.payment_url
     if (validateBookingRequest(ticket_url, orderline_list)):
       total_price = calculateOrder(orderline_list)
       create_order_resp = createOrder(user_id, total_price)
@@ -53,10 +49,8 @@ class BookEventService(ServiceBase):
         order_id = create_order_json['order_id']
         reserve_ticket_resp = reserveTicket(order_id, orderline_list)
         if (reserve_ticket_resp.ok):
-          create_invoice_resp = createInvoice(user_id, total_price)
-          if (create_invoice_resp.ok):
-            return True
-      
-    return False
+            return orderline_list
+
+    return []
     
 
