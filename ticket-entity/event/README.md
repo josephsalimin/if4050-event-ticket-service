@@ -44,7 +44,7 @@
   "end_at": "event_end_time"
 }
 ```
--Output
+- Output
 ```json5
 {
   "partner_id": "your_partner_id",
