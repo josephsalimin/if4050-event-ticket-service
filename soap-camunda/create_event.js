@@ -3,7 +3,7 @@ let baseUrl = 'http://localhost:8080/engine-rest';
 let eventUrl = 'https://1e0818c2.ngrok.io';
 let ticketUrl = 'https://0c7af3cf.ngrok.io';
 let jwtKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicGFydG5lcl9pZCI6MCwibmFtZSI6InRpY2tldHgiLCJhdXRoX3R5cGUiOiJtYXN0ZXIiLCJ0aW1lc3RhbXAiOjE1NDIzNTg2MDkzNjQuOTc3OH0.5xFtVgMrDiXR3gDUseLUkr5VMWwInmL_xZ4XUiW9_zU';
-let { Client, logger, Variables } = require('camunda-external-task-client-js');
+let { Client, Variables } = require('camunda-external-task-client-js');
 
 // Set up some configs
 let config = { baseUrl };
@@ -36,13 +36,6 @@ let tickets = {
 	]
 }
 let event_id;
-
-// camundaClient.subscribe('validate-event-detail', async function({ task, taskService }) {
-// 	let processVariables = new Variables();
-// 	processVariables.set("validated", true);
-// 	console.log(`Did validate-event-detail`);
-// 	await taskService.complete(task, processVariables);
-// });
 
 camundaClient.subscribe('validate-event-detail', async function({ task, taskService }) {
 	let processVariables = new Variables();

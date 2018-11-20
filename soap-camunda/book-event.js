@@ -115,4 +115,4 @@ camundaClient.subscribe('show-invoice-detail', async function({ task, taskServic
 	await taskService.complete(task);
 });
 
-camundaClient.start();
+// camundaClient.start();
