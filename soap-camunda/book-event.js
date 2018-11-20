@@ -1,6 +1,7 @@
 let axios = require('axios');
-let { Client, logger, Variables } = require('camunda-external-task-client-js');
 let baseUrl = 'http://localhost:8080/engine-rest';
+let jwtKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicGFydG5lcl9pZCI6MCwibmFtZSI6InRpY2tldHgiLCJhdXRoX3R5cGUiOiJtYXN0ZXIiLCJ0aW1lc3RhbXAiOjE1NDIzNTg2MDkzNjQuOTc3OH0.5xFtVgMrDiXR3gDUseLUkr5VMWwInmL_xZ4XUiW9_zU';
+let { Client, logger, Variables } = require('camunda-external-task-client-js');
 let config = { baseUrl };
 
 // create a Client instance with custom configuration
