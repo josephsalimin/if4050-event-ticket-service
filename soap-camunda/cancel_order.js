@@ -25,6 +25,13 @@ client.subscribe('notify-cancel-booking-failed', async function({ task, taskServ
 	await taskService.complete(task);
 });
 
+client.subscribe('check-order-status', async function({ task, taskService }) {
+	console.log(`Did check-order-status.`);
+
+	// Complete the task
+	await taskService.complete(task);
+});
+
 client.subscribe('refund-payment', async function({ task, taskService }) {
 	/* TODO: Invoke payment service - refund payment */
 
