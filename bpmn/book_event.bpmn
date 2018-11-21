@@ -22,7 +22,6 @@
         <bpmn:flowNodeRef>Task_07xt8gd</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_0jwpg5r</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_00kuvzn</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Task_0cv4e53</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_1dwsf8y</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_19l0dk6</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>ExclusiveGateway_1679gbu</bpmn:flowNodeRef>
@@ -36,6 +35,7 @@
         <bpmn:flowNodeRef>Task_1uz1yfr</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_07b6pvg</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>EndEvent_1242beo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_0cv4e53</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_1de2we0">
         <bpmn:flowNodeRef>Task_1lev51m</bpmn:flowNodeRef>
@@ -78,10 +78,6 @@
     <bpmn:task id="Task_00kuvzn" name="Calculate Order">
       <bpmn:incoming>SequenceFlow_01pgoto</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_110hxo2</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_0cv4e53" name="Create Order">
-      <bpmn:incoming>SequenceFlow_110hxo2</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1v3zsud</bpmn:outgoing>
     </bpmn:task>
     <bpmn:serviceTask id="Task_1dwsf8y" name="Reserve Tickets" camunda:type="external" camunda:topic="reserve-ticket">
       <bpmn:incoming>SequenceFlow_1v3zsud</bpmn:incoming>
@@ -205,6 +201,10 @@
     <bpmn:sequenceFlow id="SequenceFlow_1rq7gw3" sourceRef="ExclusiveGateway_1y5ip8u" targetRef="Task_1lev51m">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!paymentValidated}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Task_0cv4e53" name="Create Order" camunda:type="external" camunda:topic="create-order">
+      <bpmn:incoming>SequenceFlow_110hxo2</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1v3zsud</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_0o72mse" name="receive-payment-request" />
   <bpmn:message id="Message_0uqy1vq" name="Message_1c7nff6" />
@@ -300,9 +300,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SendTask_1fbu2mj_di" bpmnElement="Task_0jwpg5r">
         <dc:Bounds x="178" y="-195" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_0cv4e53_di" bpmnElement="Task_0cv4e53">
-        <dc:Bounds x="328" y="14" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1v3zsud_di" bpmnElement="SequenceFlow_1v3zsud">
         <di:waypoint x="428" y="54" />
@@ -466,6 +463,9 @@
         <di:waypoint x="968" y="415" />
         <di:waypoint x="968" y="396" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_01ulcsk_di" bpmnElement="Task_0cv4e53">
+        <dc:Bounds x="328" y="14" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
