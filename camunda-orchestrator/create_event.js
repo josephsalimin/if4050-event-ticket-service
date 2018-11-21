@@ -41,14 +41,12 @@ createEventWorker.subscribe('validate-event-detail', async function({ task, task
 			event = await JSON.parse(event);
 			sectionList = await JSON.parse(sectionList);
 			if (validateRequest(event, sectionList) && event.start_at < event.end_at) {
-				response = await instance.get(`${restUrl}/partner/${event.partner_id}`, {});
+				response = await instance.get(`${restUrl}/partner/${event.partner_id}`);
 				if (response.status == 200) {
-					response = await instance.get(`${restUrl}/event/partner`);
 					processVariables.set("event", event);
 					processVariables.set("auth_key", authKey);
 					processVariables.set("section_list", sectionList);
 					processVariables.set("callback_url", callbackURL);
-					processVariables
 					status = true;
 				}
 			}
