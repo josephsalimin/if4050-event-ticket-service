@@ -14,6 +14,8 @@ class ConfigContext(object):
     def __init__(self):
         self.ticket_url = config["TicketService"]["base_url"]
         self.event_url = config["EventService"]["base_url"]
+        self.partner_url = config["PartnerService"]["base_url"]
+        self.order_url = config["OrderService"]["base_url"]
         self.payment_url = config["PaymentService"]["base_url"]
         self.token = config["App"]["token"]
 

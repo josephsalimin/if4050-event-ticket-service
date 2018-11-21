@@ -7,8 +7,11 @@ from model import Event, Section
 
 import requests
 
-def validateEventDetail(event):
-  return event.start_at < event.end_at
+def validateEventDetail(event, partner_url, auth_header):
+  get_partner_resp = requests.get(partner_url+'/partner/', headers = auth_header)
+  is_partner_valid = get_partner_resp.ok
+  is_date_valid = event.start_at < event.end_at
+  return is_partner_valid and is_date_valid
 
 def addEvent(event_url, event, auth_header):
   create_event_payload = {
@@ -44,9 +47,10 @@ class EventCreationService(ServiceBase):
   def CreateEvent(ctx,event,section_list):
     ticket_url = ctx.udc.ticket_url;
     event_url = ctx.udc.event_url;
+    partner_url = ctx.udc.partner_url;
     auth_header = {'Authorization': ctx.udc.token}
 
-    if (not validateEventDetail(event)):
+    if (not validateEventDetail(event, partner_url, auth_header)):
       return False
     create_event_resp = addEvent(event_url, event, auth_header)
     if (create_event_resp.ok):
