@@ -57,6 +57,13 @@
 ```
 
 #### /event/<event_id>
+- Method: DELETE
+- Output
+```json5
+true
+```
+
+#### /event/<event_id>
 - Method: GET
 - Output
 ```json5
