@@ -24,12 +24,16 @@ camundaClient.subscribe('validate-request', async function({ task, taskService }
 	await taskService.complete(task, processVariables);
 });
 
+/* Booking invalid */
+
 camundaClient.subscribe('notify-cancel-booking-failed', async function({ task, taskService }) {
 	console.log(`Did notify-cancel-booking-failed.`);
 
 	// Complete the task
 	await taskService.complete(task);
 });
+
+/* Booking valid */
 
 camundaClient.subscribe('check-order-status', async function({ task, taskService }) {
   	// Set variables
@@ -42,27 +46,20 @@ camundaClient.subscribe('check-order-status', async function({ task, taskService
 	await taskService.complete(task, processVariables);
 });
 
+/* Order not paid */
+
 camundaClient.subscribe('unpaid-checking', async function({ task, taskService }) {
 	// Set variables
-  let processVariables = new Variables();
-  processVariables.set("cancelled", true);
+	let processVariables = new Variables();
+	processVariables.set("cancelled", true);
 
-  console.log(`Did unpaid-checking.`);
+	console.log(`Did unpaid-checking.`);
 
-  // Complete the task
-  await taskService.complete(task, processVariables);
+	// Complete the task
+	await taskService.complete(task, processVariables);
 });
 
-
-// camundaClient.subscribe('check-order-status', async function({ task, taskService }) {
-// 	let processVariables = new Variables();
-// 	processVariables.set("paid", true);
-
-// 	console.log(`Did check-order-status.`);
-
-// 	// Complete the task
-// 	await taskService.complete(task, processVariables);
-// });
+/* Order status paid */
 
 camundaClient.subscribe('refund-payment', async function({ task, taskService }) {
 	/* TODO: Invoke payment service - refund payment */
@@ -77,6 +74,8 @@ camundaClient.subscribe('refund-payment', async function({ task, taskService }) 
 	// Complete the task
 	await taskService.complete(task, processVariables);
 });
+
+/* Refund status success */
 
 camundaClient.subscribe('cancel-order', async function({ task, taskService }) {
 	console.log(`Did cancel-order`);
@@ -95,7 +94,3 @@ camundaClient.subscribe('notify-booking-cancelled', async function({ task, taskS
 	// Complete the task
 	await taskService.complete(task);
 });
-
-// console.log(client);
-
-// client.start();

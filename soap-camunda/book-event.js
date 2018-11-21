@@ -70,18 +70,18 @@ camundaClient.subscribe('notify-failed-booking', async function({ task, taskServ
 camundaClient.subscribe('reserve-ticket', async function({ task, taskService }) {
     // Set variables
 	let processVariables = new Variables();
-	let status = false;
+	let status = true;
 	// Invoke reserve ticket section
-	try {
-		let response = await axios.post(ticketUrl+'/ticket_section/capacity_add', reserve);
-		if(response.data === true) {
-			status = true;
-			processVariables.set("validated", status);
-		}
-	} catch(err) {
-		console.log(err);
-		processVariables.set("validated", false);
-	}
+	// try {
+	// 	let response = await axios.post(ticketUrl+'/ticket_section/capacity_add', reserve);
+	// 	if(response.data === true) {
+	// 		status = true;
+	// 		processVariables.set("validated", status);
+	// 	}
+	// } catch(err) {
+	// 	console.log(err);
+	// 	processVariables.set("validated", false);
+	// }
 	console.log(task.id);
 	console.log(`Did reserve-ticket. Status = ${status}`);
 	await taskService.complete(task);

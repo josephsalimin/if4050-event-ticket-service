@@ -49,26 +49,26 @@ camundaClient.subscribe('validate-event-detail', async function({ task, taskServ
 
 camundaClient.subscribe('add-event', async function({ task, taskService }) {
 	let response;
-	try {
-		response = await axios.post(eventUrl+'/event', data);
-		event_id = response.data.id;
-	} catch(err) {
-		throw err;
-	}
-	console.log(`Did add-event with event-name = ${response.data.name}`);
+	// try {
+	// 	response = await axios.post(eventUrl+'/event', data);
+	// 	event_id = response.data.id;
+	// } catch(err) {
+	// 	throw err;
+	// }
+	// console.log(`Did add-event with event-name = ${response.data.name}`);
 	console.log('Did add-event');
 	await taskService.complete(task);
 });
 
 camundaClient.subscribe('issue-ticket', async function({ task, taskService }) {
 	let response;
-	try {
-		tickets.event_id = event_id;
-		console.log(tickets);
-		response = await axios.post(ticketUrl+'/ticket_section', tickets);
-	} catch(err) {
-		throw err;
-	}
+	// try {
+	// 	tickets.event_id = event_id;
+	// 	console.log(tickets);
+	// 	response = await axios.post(ticketUrl+'/ticket_section', tickets);
+	// } catch(err) {
+	// 	throw err;
+	// }
 	console.log(`Did issue-ticket`);
 	await taskService.complete(task);
 });
