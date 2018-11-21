@@ -49,6 +49,19 @@ def update_event(event_id, partner_id, name, description, location, start_at, en
     return event.to_dict()
 
 
+def delete_event(event_id, partner_id):
+    """
+    Function to delete event
+    :param event_id: int
+    :param partner_id: int
+    :return: bool
+    """
+    event = Event.get_or_none(Event.id == event_id, Event.partner_id == partner_id)
+    if event is not None:
+        event.delete_instance()
+    return True
+
+
 def get_event_detail(event_id):
     """
     Function to get event detail by event_id

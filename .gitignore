@@ -1,5 +1,4 @@
 .idea/
-node_modules/
 ticket-service/__pycache__/*
 ticket-service/service/__pycache__/*
 ticket-service/model/__pycache__/*
