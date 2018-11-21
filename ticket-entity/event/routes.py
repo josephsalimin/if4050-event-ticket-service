@@ -67,7 +67,7 @@ def create():
     return jsonify(create_event(partner_id, name, description, location, start_at, end_at))
 
 
-@event.route("/<event_id>", methods=["PUT"])
+@event.route("/<int:event_id>", methods=["PUT"])
 @auth_partner
 def update(event_id):
     body = request.json
@@ -80,6 +80,12 @@ def update(event_id):
     except KeyError:
         raise ApplicationException("Input error")
     return jsonify(update_event(event_id, g.partner_id, name, description, location, start_at, end_at))
+
+
+@event.route("/<int:event_id>", methods=["DELETE"])
+@auth_partner
+def delete(event_id):
+    return jsonify(delete_event(event_id, g.partner_id))
 
 
 @event.route("/<event_id>", methods=["GET"])
