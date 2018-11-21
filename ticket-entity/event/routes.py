@@ -3,7 +3,8 @@ from .controller import *
 from .exception import ApplicationException
 from .models import DatabaseManager
 from functools import wraps
-import requests, os
+import requests
+import os
 
 
 event = Blueprint("event_controller", __name__, template_folder="templates")

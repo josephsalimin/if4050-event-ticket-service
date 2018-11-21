@@ -1,0 +1,24 @@
+{
+  "name": "charge-card-worker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+<<<<<<< HEAD
+=======
+    "request": "^2.88.0",
+>>>>>>> 83cbad088a2e46d22ecbfac8fce614e841718199
+    "soap": "^0.25.0",
+    "soap-server": "^0.1.0"
+  },
+  "devDependencies": {
+    "camunda-external-task-client-js": "^1.0.0"
+  }
+}

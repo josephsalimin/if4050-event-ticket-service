@@ -2,9 +2,10 @@ from flask import Blueprint, jsonify, request, g
 from .controller import *
 from .database import DatabaseManager
 from .exception import ApplicationException
+from functools import wraps
 
 
-# Blue print for Auth
+# Blueprint for Auth
 auth = Blueprint("auth_controller", __name__, template_folder="templates")
 
 
@@ -13,7 +14,7 @@ def before_request():
     DatabaseManager.get_database().connect()
     if request.method != 'GET' and not request.is_json:
         raise ApplicationException("Must be JSON type")
-    g.jwt = request.headers.get('Authorization', None)
+    g.jwt_token = request.headers.get('Authorization', None)
 
 
 @auth.after_request
@@ -28,16 +29,17 @@ def error_auth_exception(error):
     return jsonify(payload), error.status_code
 
 
-def check_master_auth(callback):
+def check_master_auth(f):
+    @wraps(f)
     def wrapper(*args, **kwargs):
-        if g.jwt is None:
+        if g.jwt_token is None:
             raise ApplicationException("Must add header", 401)
-        decode = jwt.decode(g.jwt, os.environ.get("REFRESH_KEY"), algorithms='HS256')
-        auth_type = decode.get("auth_type", 0)
+        decoded = jwt.decode(g.jwt_token, os.environ.get("REFRESH_KEY"), algorithms='HS256')
+        auth_type = decoded.get("auth_type", 0)
         if auth_type != "master":
             raise ApplicationException("Only TicketX can access this API", 401)
-        return callback(*args, **kwargs)
-    return wrapper()
+        return f(*args, **kwargs)
+    return wrapper
 
 
 @auth.route("/create", methods=["POST"])
@@ -71,5 +73,4 @@ def verify():
 
 @auth.route("/<auth_id>", methods=["GET"])
 def read(auth_id):
-    print(auth_id)
     return jsonify(get_auth(auth_id))

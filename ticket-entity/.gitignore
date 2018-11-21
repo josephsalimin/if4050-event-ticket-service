@@ -2,3 +2,9 @@ venv/
 .env
 .idea/
 .vscode
+auth/__pycache__
+user/__pycache__
+partner/__pycache__
+event/__pycache__
+order/__pycache__
+ticket/__pycache__
