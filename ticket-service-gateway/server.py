@@ -3,9 +3,11 @@ from spyne.application import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from configparser import ConfigParser
+from util.payload_builder import build_payload
 
 from create_event.create_event_service import CreateEventService
-
+from book_event.book_event_service import BookEventService
+from cancel_order.cancel_order_service import CancelOrderService
 
 config = ConfigParser()
 config.read('config.ini')
@@ -14,7 +16,9 @@ config.read('config.ini')
 class ConfigContext(object):
     def __init__(self):
         self.token = config["App"]["token"]
-
+        self.create_event_url = config["CamundaService"]["create_event_url"]
+        self.cancel_order_url = config["CamundaService"]["cancel_order_url"]
+        self.book_event_url = config["CamundaService"]["book_event_url"]
 
 def _on_method_call(ctx):
     ctx.udc = ConfigContext()
