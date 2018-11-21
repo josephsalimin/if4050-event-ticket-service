@@ -11,7 +11,7 @@
     <bpmn:messageFlow id="MessageFlow_0zuevwz" sourceRef="SendTask_1nkzdff" targetRef="Participant_1t12xc1" />
     <bpmn:messageFlow id="MessageFlow_1drfwji" sourceRef="SendTask_1835lhs" targetRef="Participant_0gnougc" />
   </bpmn:collaboration>
-  <bpmn:process id="order-cancel" name="Order Cancellaio" isExecutable="true">
+  <bpmn:process id="order-cancel" name="Cancel Order" isExecutable="true">
     <bpmn:serviceTask id="ServiceTask_0rscujp" name="Validate Request" camunda:type="external" camunda:topic="validate-request">
       <bpmn:incoming>SequenceFlow_11wct4i</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1l73gbf</bpmn:outgoing>
