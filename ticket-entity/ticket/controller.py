@@ -98,7 +98,7 @@ def validate_ticket_section(list_ticket_section):
     """
     for ticket_section in list_ticket_section:
         section = Section.get_or_none(Section.id == ticket_section["id"])
-        if section is None or section.max_capacity - section.current_capacity < ticket_section["quantity"]:
+        if section is None or (section.max_capacity - section.current_capacity) < ticket_section["quantity"]:
             return False
     return True
 

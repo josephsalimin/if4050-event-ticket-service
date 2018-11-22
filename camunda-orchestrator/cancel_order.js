@@ -1,106 +1,122 @@
 let axios = require('axios');
-let baseUrl = 'http://localhost:8080/engine-rest';
-let restUrl = 'http://localhost:5050';
-let jwtKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicGFydG5lcl9pZCI6MCwibmFtZSI6InRpY2tldHgiLCJhdXRoX3R5cGUiOiJtYXN0ZXIiLCJ0aW1lc3RhbXAiOjE1NDIzNTg2MDkzNjQuOTc3OH0.5xFtVgMrDiXR3gDUseLUkr5VMWwInmL_xZ4XUiW9_zU';
+let soap = require('soap');
 let { Client, Variables } = require('camunda-external-task-client-js');
 
-// create a Client instance with custom configuration
+const baseUrl = 'http://localhost:8080/engine-rest';
+const restUrl = 'http://localhost:5050';
+
+// Create a Client instance with custom configuration
 let config = { baseUrl };
 let cancelOrderWorker = new Client(config);
-axios.defaults.headers.common['Authorization'] = jwtKey;
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-
-
-// Set order data
-let order;
-let orderStatus;
+let axiosOptions = {}, axiosInstance;
 
 cancelOrderWorker.subscribe('validate-request', async function({ task, taskService }) {
-	// Set variables
+	// Get all variables
 	let orderID = task.variables.get('order_id');
+	let authKey = task.variables.get('auth_key');
+	let callbackURL = task.variables.get("callback_url");
+	let status = false, error = "Error";
+	// Set Process Variables
 	let processVariables = new Variables();
-	let status = false;
 	// Validate order data
-	try {
-		console.log(orderID);
-		console.log(`${restUrl}/order/${orderID}`);
-		let response = await axios.get(`http://localhost:5050/order/2`);
-		console.log(response);
-		if(response.status === 200) {
-			status = true;
-			order = response.data;
-			orderStatus = order.status;
-			processVariables.set('validated', true);
-			processVariables.set('paid', (orderStatus === 'paid'));
-			processVariables.set('cancelled', (orderStatus === 'cancelled'));
-			processVariables.set('pending', (orderStatus === 'pending'));
-		} else {
-			processVariables.set('validated', false);
+	if (orderID && authKey && callbackURL) {
+		axiosOptions.headers = {'Authorization': authKey, 'Content-Type': 'application/json'};
+		axiosInstance = axios.create(axiosOptions);
+		try {
+			let response = await axiosInstance.get(`${restUrl}/order/${orderID}`);
+			if (response.status === 200) {
+				status = true;
+				processVariables.set('order', response.data);
+				processVariables.set('auth_key', authKey);
+			} 
+		} catch(err) {
+			error = err.message;
 		}
-	} catch(err) {
-		throw err;
-		processVariables.set('validated', false);
 	}
-
+	if (!status) processVariables.set("message_error", error);
+	processVariables.set('validated', status);
 	console.log(`Did validate-request. Set variable validated=${status}`);
 	await taskService.complete(task, processVariables);
 });
 
-/* Booking invalid */
-
-cancelOrderWorker.subscribe('notify-cancel-booking-failed', async function({ task, taskService }) {
-	console.log(`Did notify-cancel-booking-failed.`);
-	await taskService.complete(task);
-});
-
-/* Booking valid */
-
-cancelOrderWorker.subscribe('check-order-status', async function({ task, taskService }) {
-  	// Set variables
+/* Check if order is paid or not */
+cancelOrderWorker.subscribe('paid-order-checking', async function({ task, taskService }) {
+	// Get variables
+	let orderStatus = task.variables.get("order").status;
+	// Set Process Variables
 	let processVariables = new Variables();
-	// processVariables.set("paid", true);
-
+	if (orderStatus == 'paid') processVariables.set('paid', true);
+	else processVariables.set('paid', false);
 	console.log(`Did check-order-status.`);
 	await taskService.complete(task, processVariables);
 });
 
-/* Order not paid */
-
-cancelOrderWorker.subscribe('unpaid-checking', async function({ task, taskService }) {
-	// Set variables
+/* Check if order is cancelled or pending */
+cancelOrderWorker.subscribe('unpaid-order-checking', async function({ task, taskService }) {
+	// Get variables
+	let orderStatus = task.variables.get("order").status;
+	// Set Process Variables
 	let processVariables = new Variables();
-	processVariables.set("cancelled", true);
-
+	if (orderStatus == 'cancelled') {
+		processVariables.set('cancelled', true);
+	} else {
+		processVariables.set('cancelled', false);
+	}
 	console.log(`Did unpaid-checking.`);
 	await taskService.complete(task, processVariables);
 });
 
 /* Order status paid */
-
 cancelOrderWorker.subscribe('refund-payment', async function({ task, taskService }) {
 	/* TODO: Invoke payment service - refund payment */
-
-	// Set variables
-	let processVariables = new Variables();
-	processVariables.set("success", true);
-
 	console.log(`Did refund-payment. Set variable success=${true}`);
 	await taskService.complete(task, processVariables);
 });
 
-/* Refund status success */
-
-cancelOrderWorker.subscribe('cancel-order', async function({ task, taskService }) {
+/* Refund Status Success */
+cancelOrderWorker.subscribe('cancel-order', async function({ task, taskService }) {	
+	// Get variables
+	let order = task.variables.get('order');
+	let response, listSection;
+	// Set Process Variables
+	let processVariables = new Variables();
+	response = await axios.delete(`${restUrl}/order/${order.id}`);
+	listSection = response.data;
+	processVariables.set('section_list', listSection);
 	console.log(`Did cancel-order`);
-	await taskService.complete(task);
+	await taskService.complete(task, processVariables);
 });
 
+/* Release Ticket */
 cancelOrderWorker.subscribe('release-ticket', async function({ task, taskService }) {
+	let listSection = task.variables.get('section_list');
+	let order = task.variables.get('order');
+	let request = {"section_list": listSection};
+	// Add to capacity for ticket section
+	await axios.post(`${restUrl}/ticket_section/capacity_add`, request);
+	// If order status is paid, then we must delete ticket with that order id
+	if (order.status === 'paid') {
+		await axios.delete(`${restUrl}`, {"order_id": order.id});
+	}
 	console.log(`Did release-ticket`);
 	await taskService.complete(task);
 });
 
+/* Notify Cancel Failed */
+cancelOrderWorker.subscribe('notify-cancel-booking-failed', async function({ task, taskService }) {
+	let callbackURL = task.variables.get("callback_url");
+	let error = task.variables.get("message_error");
+	/* TODO: throw message to callback URL */
+	console.log(`Did notify-cancel-booking-failed. error: ${error}`);
+	await taskService.complete(task);
+});
+
+/* Notify Cancel Success*/
 cancelOrderWorker.subscribe('notify-booking-cancelled', async function({ task, taskService }) {
+	let callbackURL = task.variables.get("callback_url");
+	/* TODO: throw message to callback URL */
 	console.log(`Did notify-booking-cancelled`);
 	await taskService.complete(task);
 });
+
+module.exports = cancelOrderWorker;

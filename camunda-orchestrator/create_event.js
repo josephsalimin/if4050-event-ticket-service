@@ -1,13 +1,13 @@
 let axios = require('axios');
-let restUrl = 'http://localhost:5050';
-let baseUrl = 'http://localhost:8080/engine-rest';
-// let jwtKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicGFydG5lcl9pZCI6MCwibmFtZSI6InRpY2tldHgiLCJhdXRoX3R5cGUiOiJtYXN0ZXIiLCJ0aW1lc3RhbXAiOjE1NDIzNTg2MDkzNjQuOTc3OH0.5xFtVgMrDiXR3gDUseLUkr5VMWwInmL_xZ4XUiW9_zU';
 let { Client, Variables } = require('camunda-external-task-client-js');
-// Set up configs
+
+const restUrl = 'http://localhost:5050';
+const baseUrl = 'http://localhost:8080/engine-rest';
+
+// Create a Client instance with custom configuration
 let config = { baseUrl };
 let createEventWorker = new Client(config);
-let axiosOptions = {};
-let instance;
+let axiosOptions = {}, instance;
 
 function validateRequest(event, sectionList) {
 	let eventValidate = event.hasOwnProperty("partner_id") && 
@@ -27,12 +27,14 @@ function validateRequest(event, sectionList) {
 }
 
 createEventWorker.subscribe('validate-event-detail', async function({ task, taskService }) {
+	// Get all variables
 	let event = task.variables.get("event");
 	let sectionList = task.variables.get("section_list");
 	let callbackURL = task.variables.get("callback_url");
 	let authKey = task.variables.get("auth_key");
-	let processVariables = new Variables();
 	let status = false, error = "Error", response;
+	// Set Process Variables
+	let processVariables = new Variables();
 	// Running
 	if (event && sectionList && callbackURL && authKey) {	
 		axiosOptions.headers = {'Authorization': authKey, 'Content-Type': 'application/json'};
@@ -55,16 +57,17 @@ createEventWorker.subscribe('validate-event-detail', async function({ task, task
 		}
 	}
 	if (!status) processVariables.set("message_error", error);
-	// Set validated
 	processVariables.set("validated", status);
 	console.log(`Did validate-event-detail. Set variable validated = ${status}`);
   await taskService.complete(task, processVariables);
 });
 
 createEventWorker.subscribe('add-event', async function({ task, taskService }) {
+	// Get all variables
 	let event = task.variables.get("event");
-	let processVariables = new Variables();
 	let success = false, error = "Error", response;
+	// Set Process Variables
+	let processVariables = new Variables();
 
 	try {
 		response = await instance.post(`${restUrl}/event/`, event);
@@ -80,23 +83,16 @@ createEventWorker.subscribe('add-event', async function({ task, taskService }) {
 });
 
 createEventWorker.subscribe('issue-ticket', async function({ task, taskService }) {
+	// Get all variables
 	let event = task.variables.get("event");
 	let sectionList = task.variables.get("section_list");
+	let success = false, error = "Error", response;
+	// Set process variables
 	let processVariables = new Variables();
-	let success = false;
-	let error = "Error";
-	let response;
-
 	try {
-		let payload = {
-			"event_id": event.id,
-			"section_list": sectionList
-		}
+		let payload = {"event_id": event.id, "section_list": sectionList}
 		response = await instance.post(`${restUrl}/ticket_section/`, payload);
-		if (response.status < 400) {
-			success = response.data;
-			console.log(success);
-		} 
+		if (response.status < 400) success = response.data;
 	} catch (err) {
 		error = err.message;
 	}
