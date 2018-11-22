@@ -59,7 +59,7 @@ createEventWorker.subscribe('validate-event-detail', async function({ task, task
 	if (!status) processVariables.set("message_error", error);
 	processVariables.set("validated", status);
 	console.log(`Did validate-event-detail. Set variable validated = ${status}`);
-  await taskService.complete(task, processVariables);
+  	await taskService.complete(task, processVariables);
 });
 
 createEventWorker.subscribe('add-event', async function({ task, taskService }) {
