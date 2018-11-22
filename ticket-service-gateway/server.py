@@ -3,7 +3,6 @@ from spyne.application import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from configparser import ConfigParser
-from util.payload_builder import build_payload
 
 from create_event.create_event_service import CreateEventService
 from book_event.book_event_service import BookEventService
@@ -20,12 +19,13 @@ class ConfigContext(object):
         self.cancel_order_url = config["CamundaService"]["cancel_order_url"]
         self.book_event_url = config["CamundaService"]["book_event_url"]
 
+
 def _on_method_call(ctx):
     ctx.udc = ConfigContext()
 
 
 CreateEventService.event_manager.add_listener('method_call', _on_method_call)
-application = Application([CreateEventService], 'spyne.ticketx.ppls',
+application = Application([CreateEventService], 'spyne.examples.hello.http',
                           in_protocol=Soap11(validator='lxml'),
                           out_protocol=Soap11())
 

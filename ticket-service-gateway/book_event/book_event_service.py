@@ -3,7 +3,7 @@ from spyne.model.complex import Iterable
 from spyne.model.primitive import Unicode, Boolean, Integer
 from spyne.service import ServiceBase
 from datetime import datetime
-from models import BookEventRequest, BookEventResponse
+from .models import BookEventRequest, BookEventResponse
 
 import requests
 

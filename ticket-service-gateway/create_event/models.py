@@ -1,9 +1,10 @@
 from spyne.model.primitive import Unicode, Integer, UnsignedInteger32, Boolean
-from spyne.model.complex import ComplexModel, Iterable
+from spyne.model.complex import ComplexModel, Array
 
 
 class Event(ComplexModel):
     __namespace__ = 'create_event_service'
+    __type_name__ = 'Event'
 
     name = Unicode
     location = Unicode
@@ -15,10 +16,9 @@ class Event(ComplexModel):
 
 class Section(ComplexModel):
     __namespace__ = 'create_event_service'
+    __type_name__ = 'Section'
 
-    id = UnsignedInteger32
     name = Unicode
-    event_id = UnsignedInteger32
     capacity = Integer
     price = Integer
     has_seat = Boolean
@@ -26,14 +26,16 @@ class Section(ComplexModel):
 
 class CreateEventRequest(ComplexModel):
     __namespace__ = 'create_event_service'
+    __type_name__ = 'CreateEventRequest'
 
     event = Event
-    list_section = Iterable(Section)
+    list_section = Array(Section)
     callback_url = Unicode
 
 
 class CreateEventResponse(ComplexModel):
     __namespace__ = 'create_event_service'
+    __type_name__ = 'CreateEventResponse'
 
     status_code = UnsignedInteger32
     message = Unicode

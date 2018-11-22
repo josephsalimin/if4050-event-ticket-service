@@ -7,9 +7,11 @@ def build_payload(args_dict):
         payload["variables"][key] = {}
         if isinstance(args_dict[key], dict):
             payload["variables"][key]["value"] = json.dumps(args_dict[key])
+        elif isinstance(args_dict[key], list):
+            payload["variables"][key]["value"] = json.dumps(args_dict[key])
         else:
             payload["variables"][key]["value"] = args_dict[key]
 
         payload["variables"][key]["type"] = "String"
 
-    return json.dumps(payload)
+    return payload

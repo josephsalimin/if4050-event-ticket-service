@@ -1,10 +1,12 @@
 from spyne.model.primitive import Unicode, Integer, UnsignedInteger32, Boolean
 from spyne.model.complex import ComplexModel, Iterable
 
+
 class CancelOrderRequest(ComplexModel):
     __namespace__ = 'cancel_order_service'
 
     order_id = Integer
+    callback_url = Unicode
 
 
 class CancelOrderResponse(ComplexModel):

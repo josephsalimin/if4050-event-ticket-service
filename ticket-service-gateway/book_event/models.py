@@ -3,7 +3,7 @@ from spyne.model.complex import ComplexModel, Iterable
 
 
 class Section(ComplexModel):
-    __namespace__ = 'create_event_service'
+    __namespace__ = 'book_event_service'
 
     id = UnsignedInteger32
     name = Unicode
