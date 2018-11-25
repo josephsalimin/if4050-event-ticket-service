@@ -10,6 +10,7 @@
     <bpmn:messageFlow id="MessageFlow_019grbt" sourceRef="SendTask_0r4ryou" targetRef="Participant_0gnougc" />
     <bpmn:messageFlow id="MessageFlow_0zuevwz" sourceRef="SendTask_1nkzdff" targetRef="Participant_1t12xc1" />
     <bpmn:messageFlow id="MessageFlow_1drfwji" sourceRef="SendTask_1835lhs" targetRef="Participant_0gnougc" />
+    <bpmn:messageFlow id="MessageFlow_113dyi5" sourceRef="Participant_0gnougc" targetRef="StartEvent_1f4g5p7" />
   </bpmn:collaboration>
   <bpmn:process id="order-cancel" name="Cancel Order" isExecutable="true">
     <bpmn:sequenceFlow id="SequenceFlow_11wct4i" sourceRef="StartEvent_1f4g5p7" targetRef="ServiceTask_0rscujp" />
@@ -46,9 +47,6 @@
     <bpmn:sequenceFlow id="SequenceFlow_1pgz7da" name="Failed" sourceRef="ExclusiveGateway_1xr8l3a" targetRef="SendTask_1835lhs">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!success}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:startEvent id="StartEvent_1f4g5p7" name="Start">
-      <bpmn:outgoing>SequenceFlow_11wct4i</bpmn:outgoing>
-    </bpmn:startEvent>
     <bpmn:sendTask id="SendTask_1835lhs" name="Notify Cancel Booking Failed" camunda:type="external" camunda:topic="notify-cancel-booking-failed">
       <bpmn:incoming>SequenceFlow_1u8x1w4</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_1asy5xa</bpmn:incoming>
@@ -114,6 +112,10 @@
       <bpmn:incoming>SequenceFlow_11wct4i</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1l73gbf</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:startEvent id="StartEvent_1f4g5p7" name="Start">
+      <bpmn:outgoing>SequenceFlow_11wct4i</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:startEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1w2dzzf">
@@ -303,12 +305,16 @@
           <dc:Bounds x="991" y="1036" width="30" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="StartEvent_048xl5r_di" bpmnElement="StartEvent_1f4g5p7">
+      <bpmndi:BPMNShape id="StartEvent_0xu1cua_di" bpmnElement="StartEvent_1f4g5p7">
         <dc:Bounds x="213" y="1091" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="220" y="1134" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="MessageFlow_113dyi5_di" bpmnElement="MessageFlow_113dyi5">
+        <di:waypoint x="231" y="934" />
+        <di:waypoint x="231" y="1091" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

@@ -3,7 +3,7 @@ from spyne.model.complex import ComplexModel, Array
 
 
 class Event(ComplexModel):
-    __namespace__ = 'create_event_service'
+    __namespace__ = 'spyne.ticketx.service'
     __type_name__ = 'Event'
 
     name = Unicode
@@ -15,7 +15,7 @@ class Event(ComplexModel):
 
 
 class Section(ComplexModel):
-    __namespace__ = 'create_event_service'
+    __namespace__ = 'spyne.ticketx.service'
     __type_name__ = 'Section'
 
     name = Unicode
@@ -25,7 +25,7 @@ class Section(ComplexModel):
 
 
 class CreateEventRequest(ComplexModel):
-    __namespace__ = 'create_event_service'
+    __namespace__ = 'spyne.ticketx.service'
     __type_name__ = 'CreateEventRequest'
 
     event = Event
@@ -34,7 +34,7 @@ class CreateEventRequest(ComplexModel):
 
 
 class CreateEventResponse(ComplexModel):
-    __namespace__ = 'create_event_service'
+    __namespace__ = 'spyne.ticketx.service'
     __type_name__ = 'CreateEventResponse'
 
     status_code = UnsignedInteger32

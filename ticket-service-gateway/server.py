@@ -6,7 +6,9 @@ from configparser import ConfigParser
 
 from create_event.create_event_service import CreateEventService
 from book_event.book_event_service import BookEventService
+from payment.order_payment_service import OrderPayment
 from cancel_order.cancel_order_service import CancelOrderService
+
 
 config = ConfigParser()
 config.read('config.ini')
@@ -25,11 +27,12 @@ def _on_method_call(ctx):
 
 
 CreateEventService.event_manager.add_listener('method_call', _on_method_call)
-application = Application([CreateEventService], 'spyne.examples.hello.http',
+application = Application([CreateEventService, BookEventService, OrderPayment, CancelOrderService], 'spyne.ticketx.service',
                           in_protocol=Soap11(validator='lxml'),
                           out_protocol=Soap11())
 
 wsgi_application = WsgiApplication(application)
+
 
 if __name__ == '__main__':
     server = make_server('127.0.0.1', 8000, wsgi_application)

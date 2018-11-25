@@ -3,37 +3,29 @@ from spyne.model.complex import ComplexModel, Iterable
 
 
 class Section(ComplexModel):
-    __namespace__ = 'book_event_service'
+    __namespace__ = 'spyne.ticketx.service'
 
     id = UnsignedInteger32
-    name = Unicode
-    event_id = UnsignedInteger32
-    capacity = Integer
+    quantity = UnsignedInteger32
     price = Integer
-    has_seat = Boolean
-
-
-class Order(ComplexModel):
-  __namespace__ = 'book_event_service'
-
-  user_id = Integer
-  total_price = Integer
-  section_list = Iterable(Section)
 
 
 class BookEventRequest(ComplexModel):
-  __namespace__ = 'book_event_service'
+    __namespace__ = 'spyne.ticketx.service'
 
-  order = Order
+    user_id = Integer
+    section_list = Iterable(Section)
+    callback_url = Unicode
 
 
 class BookEventResponse(ComplexModel):
-  __namespace__ = 'book_event_service'
+    __namespace__ = 'spyne.ticketx.service'
 
-  status_code = UnsignedInteger32
-  message = Unicode
+    status_code = UnsignedInteger32
+    message = Unicode
 
-  def __init__(self, status_code, message):
-      super(CancelOrderResponse, self).__init__()
-      self.status_code = status_code
-      self.message = message
+    def __init__(self, instance_id, status_code, message):
+        super(CancelOrderResponse, self).__init__()
+        self.instance_id = instance_id
+        self.status_code = status_code
+        self.message = message

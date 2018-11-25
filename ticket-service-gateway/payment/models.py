@@ -2,14 +2,16 @@ from spyne.model.primitive import Unicode, Integer, UnsignedInteger32, Boolean
 from spyne.model.complex import ComplexModel, Iterable
 
 
-class CancelOrderRequest(ComplexModel):
+class OrderPaymentRequest(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
 
+    user_id = Integer
     order_id = Integer
+    instance_id = Unicode
     callback_url = Unicode
 
 
-class CancelOrderResponse(ComplexModel):
+class OrderPaymentResponse(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
 
     status_code = UnsignedInteger32

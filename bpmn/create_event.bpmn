@@ -25,11 +25,6 @@
       <bpmn:outgoing>SequenceFlow_0l39pl7</bpmn:outgoing>
       <bpmn:messageEventDefinition messageRef="Message_13ljtcb" />
     </bpmn:startEvent>
-    <bpmn:exclusiveGateway id="ExclusiveGateway_06bg1jw">
-      <bpmn:incoming>SequenceFlow_076vwrj</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0av4lad</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_0mh8rss</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="SequenceFlow_03j7jvd" sourceRef="Task_0jhxdtq" targetRef="EndEvent_04tgayf" />
     <bpmn:sequenceFlow id="SequenceFlow_1jbo1ro" sourceRef="Task_034kmrh" targetRef="EndEvent_0mlppsl" />
     <bpmn:sequenceFlow id="SequenceFlow_1f9scpk" name="Invalid" sourceRef="ExclusiveGateway_16dfcwp" targetRef="Task_034kmrh">
@@ -77,13 +72,19 @@
       <bpmn:incoming>SequenceFlow_19w8mkn</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1jbo1ro</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:endEvent id="EndEvent_0mlppsl" name="Create Event&#10;Failed">
-      <bpmn:incoming>SequenceFlow_1jbo1ro</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:serviceTask id="Task_0epgiwu" name="Delete Event" camunda:type="external" camunda:topic="delete-event">
       <bpmn:incoming>SequenceFlow_0wqwp5k</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_19w8mkn</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_06bg1jw">
+      <bpmn:incoming>SequenceFlow_076vwrj</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0av4lad</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0mh8rss</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_0mlppsl" name="Create Event&#10;Failed">
+      <bpmn:incoming>SequenceFlow_1jbo1ro</bpmn:incoming>
+      <bpmn:terminateEventDefinition />
+    </bpmn:endEvent>
   </bpmn:process>
   <bpmn:message id="Message_13ljtcb" name="receive-input" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -129,12 +130,6 @@
           <dc:Bounds x="438" y="-30" width="33" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_0mlppsl_di" bpmnElement="EndEvent_0mlppsl">
-        <dc:Bounds x="669" y="-67" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="655" y="-24" width="65" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1jbo1ro_di" bpmnElement="SequenceFlow_1jbo1ro">
         <di:waypoint x="602" y="-3" />
         <di:waypoint x="636" y="-3" />
@@ -179,26 +174,26 @@
         <dc:Bounds x="771" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_06bg1jw_di" bpmnElement="ExclusiveGateway_06bg1jw" isMarkerVisible="true">
-        <dc:Bounds x="662" y="95" width="50" height="50" />
+        <dc:Bounds x="671" y="95" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_076vwrj_di" bpmnElement="SequenceFlow_076vwrj">
         <di:waypoint x="632" y="120" />
-        <di:waypoint x="662" y="120" />
+        <di:waypoint x="671" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0av4lad_di" bpmnElement="SequenceFlow_0av4lad">
-        <di:waypoint x="687" y="95" />
-        <di:waypoint x="687" y="64" />
+        <di:waypoint x="696" y="95" />
+        <di:waypoint x="696" y="64" />
         <di:waypoint x="552" y="64" />
         <di:waypoint x="552" y="37" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="588" y="46" width="63" height="14" />
+          <dc:Bounds x="593" y="46" width="63" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0mh8rss_di" bpmnElement="SequenceFlow_0mh8rss">
-        <di:waypoint x="712" y="120" />
+        <di:waypoint x="721" y="120" />
         <di:waypoint x="771" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="720" y="102" width="43" height="14" />
+          <dc:Bounds x="725" y="102" width="43" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_0vyrntw_di" bpmnElement="ExclusiveGateway_0vyrntw" isMarkerVisible="true">
@@ -228,6 +223,12 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_119wqjm_di" bpmnElement="Task_0epgiwu">
         <dc:Bounds x="912" y="-26" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_17szhio_di" bpmnElement="EndEvent_0mlppsl">
+        <dc:Bounds x="669" y="-67" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="655" y="-24" width="65" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
