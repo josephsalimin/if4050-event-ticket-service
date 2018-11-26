@@ -34,7 +34,6 @@ class OrderPaymentService(ServiceBase):
         callback_url = OrderPaymentRequest.callback_url
         # Create payload
         payload = create_request(user_id, order_id, instance_id, callback_url, tenant_id, auth_key, message_name)
-        payload = build_payload(payload)
         camunda_resp = requests.post(message_url, json=payload)
         if camunda_resp.status_code == 404:
             raise ResourceNotFoundError(camunda_resp)

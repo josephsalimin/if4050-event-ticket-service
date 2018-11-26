@@ -31,7 +31,6 @@ class BookEventService(ServiceBase):
         callback_url = BookEventRequest.callback_url
         # Create payload and post to request
         payload = create_request(user_id, section_list, callback_url, auth_key)
-        payload = build_payload(payload)
         camunda_resp = requests.post(book_event_url, json=payload)
         if camunda_resp.status_code == 404:
             raise ResourceNotFoundError(camunda_resp)

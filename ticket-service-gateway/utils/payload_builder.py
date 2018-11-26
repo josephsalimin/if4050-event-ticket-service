@@ -12,6 +12,9 @@ def build_payload(args_dict):
         else:
             payload["variables"][key]["value"] = args_dict[key]
 
-        payload["variables"][key]["type"] = "String"
+        if isinstance(args_dict[key],str):        
+            payload["variables"][key]["type"] = "String"
+        else:
+            payload["variables"][key]["type"] = "Integer"
 
     return payload
