@@ -34,24 +34,23 @@ bookEventWorker.subscribe('validate-booking-request', async function({ task, tas
 		instance = axios.create(axiosOptions);
 		try {
 			sectionList = await JSON.parse(sectionList);
-			if (validateRequest(userID, sectionList)) {
+			if (validateRequest(sectionList.section_list, userID)) {
 				let response = await instance.post(`${restUrl}/ticket_section/validation`, sectionList);
-				if (response.data == true) {
+				if (response.data === true) {
+					sectionList = sectionList.section_list;
 					processVariables.set("user_id", userID);
 					processVariables.set("section_list", sectionList);
 					processVariables.set("auth_key", authKey);
 					processVariables.set("callback_url", callbackURL);
-					processVariables.set('validated', true);
-				} else {
-					processVariables.set('validated', false);
+					status = true;
 				}
-			} else {
-				processVariables.set('validated', false);
 			}
 		} catch (err) {
 			error = err.message;
+			console.log(error);
 		}
 	}
+	processVariables.set("validated", status);
 	if (!status) processVariables.set("message_error", error);
 	console.log(`Did validate-request. Set variable validated=${status}`);
 	await taskService.complete(task, processVariables);
@@ -61,7 +60,7 @@ bookEventWorker.subscribe('validate-booking-request', async function({ task, tas
 bookEventWorker.subscribe('calculate-order', async function({ task ,taskService}) {
 	// Invoke create order
 	let sectionList = task.variables.get('section_list');
-	let userID = task.variables.get('section_id');
+	let userID = task.variables.get('user_id');
 	// Set Process Variables
 	let processVariables = new Variables();
 	let totalPrice = 0;
@@ -73,6 +72,7 @@ bookEventWorker.subscribe('calculate-order', async function({ task ,taskService}
 		'total_price': totalPrice,
 		'section_list': sectionList
 	};
+	console.log(order);
 	processVariables.set('order', order);
 	await taskService.complete(task, processVariables);
 
@@ -85,7 +85,7 @@ bookEventWorker.subscribe('create-order', async function({ task, taskService }) 
 	let response = await instance.post(restUrl + '/order', order);
 	processVariables.set('order_id', response.data.id);
 	console.log(`Did create-order.`);
-	await taskService.complete(task);
+	await taskService.complete(task, processVariables);
 });
 
 /* Reserve Ticket */
@@ -95,6 +95,9 @@ bookEventWorker.subscribe('reserve-ticket', async function({ task, taskService }
 	let status = true;
 	// Get variables
 	let section_list = task.variables.get('section_list');
+	section_list = {
+		"section_list": section_list
+	};
 	// Invoke reserve ticket section
 	let response = await instance.post(restUrl + '/ticket_section/capacity_add', section_list);
 	console.log(`Did reserve-ticket. Status = ${response.data}`);
@@ -104,6 +107,8 @@ bookEventWorker.subscribe('reserve-ticket', async function({ task, taskService }
 /* No Payment Request */
 bookEventWorker.subscribe('cancel-order', async function({ task, taskService }) {
 	let order_id = task.variables.get('order_id');
+	console.log(order_id);
+	console.log(restUrl+`/order/${order_id}`);
 	let response = await instance.delete(restUrl+`/order/${order_id}`);
 	console.log(`Did cancel-order.`);
 	await taskService.complete(task);
@@ -111,6 +116,7 @@ bookEventWorker.subscribe('cancel-order', async function({ task, taskService }) 
 
 bookEventWorker.subscribe('release-ticket', async function({ task, taskService }) {
 	let section_list = task.variables.get('section_list');
+	console.log(section_list);
 	let response = await instance.post(restUrl+'/ticket_section/capacity_reduce', section_list);
 	console.log(`Did release-ticket.`);
 	await taskService.complete(task);
@@ -128,7 +134,7 @@ bookEventWorker.subscribe('validate-payment-request', async function({ task, tas
 bookEventWorker.subscribe('send-payment-request', async function({ task, taskService }) {
 	// TODO: SOAP
 	let processVariables = new Variables();
-	processVariables.set('paymentSuccess', true);
+	// processVariables.set('paymentSuccess', true);
 	console.log(`Did send-payment-request.`);
 	await taskService.complete(task, processVariables);
 });
@@ -148,7 +154,7 @@ bookEventWorker.subscribe('set-order-to-paid', async function({ task, taskServic
 	await taskService.complete(task);
 });
 
-bookEventWorker.subscribe('generate-ticket', async function({ task, taskService }) {
+bookEventWorker.subscribe('generate-tickets', async function({ task, taskService }) {
 	let order_id = task.variables.get('order_id');
 	let section_list = task.variables.get('section_list');
 	let ticket = {order_id, section_list}

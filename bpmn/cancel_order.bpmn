@@ -13,6 +13,8 @@
     <bpmn:messageFlow id="MessageFlow_113dyi5" sourceRef="Participant_0gnougc" targetRef="StartEvent_1f4g5p7" />
   </bpmn:collaboration>
   <bpmn:process id="order-cancel" name="Cancel Order" isExecutable="true">
+    <bpmn:sequenceFlow id="SequenceFlow_08fmx0z" sourceRef="Task_1fl0nn0" targetRef="ExclusiveGateway_1xr8l3a" />
+    <bpmn:sequenceFlow id="SequenceFlow_09pje4q" sourceRef="ReceiveTask_0cgv5di" targetRef="Task_1fl0nn0" />
     <bpmn:sequenceFlow id="SequenceFlow_11wct4i" sourceRef="StartEvent_1f4g5p7" targetRef="ServiceTask_0rscujp" />
     <bpmn:sequenceFlow id="SequenceFlow_1l73gbf" sourceRef="ServiceTask_0rscujp" targetRef="ExclusiveGateway_0disbob" />
     <bpmn:sequenceFlow id="SequenceFlow_1wtjrb4" name="Valid" sourceRef="ExclusiveGateway_0disbob" targetRef="ServiceTask_1plrizu">
@@ -25,7 +27,6 @@
     <bpmn:sequenceFlow id="SequenceFlow_0xuufhq" sourceRef="ServiceTask_0h6bm8c" targetRef="ServiceTask_0j5rcbt" />
     <bpmn:sequenceFlow id="SequenceFlow_0m2gi8y" sourceRef="ServiceTask_0j5rcbt" targetRef="SendTask_0r4ryou" />
     <bpmn:sequenceFlow id="SequenceFlow_1y5pzyu" sourceRef="SendTask_0r4ryou" targetRef="EndEvent_0752ks0" />
-    <bpmn:sequenceFlow id="SequenceFlow_1ej7c9j" sourceRef="ReceiveTask_0cgv5di" targetRef="ExclusiveGateway_1xr8l3a" />
     <bpmn:sequenceFlow id="SequenceFlow_1l8ggk0" name="Success" sourceRef="ExclusiveGateway_1xr8l3a" targetRef="ServiceTask_0h6bm8c">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${success}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -47,76 +48,81 @@
     <bpmn:sequenceFlow id="SequenceFlow_1pgz7da" name="Failed" sourceRef="ExclusiveGateway_1xr8l3a" targetRef="SendTask_1835lhs">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!success}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sendTask id="SendTask_1835lhs" name="Notify Cancel Booking Failed" camunda:type="external" camunda:topic="notify-cancel-booking-failed">
-      <bpmn:incoming>SequenceFlow_1u8x1w4</bpmn:incoming>
-      <bpmn:incoming>SequenceFlow_1asy5xa</bpmn:incoming>
-      <bpmn:incoming>SequenceFlow_1pgz7da</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_18lnbai</bpmn:outgoing>
-    </bpmn:sendTask>
-    <bpmn:endEvent id="EndEvent_15j40vo" name="Cancel Order Failed">
-      <bpmn:incoming>SequenceFlow_18lnbai</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:exclusiveGateway id="ExclusiveGateway_1mq4oaw">
-      <bpmn:incoming>SequenceFlow_14ttodh</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_12h2dw3</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_1asy5xa</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Task_08r4275" name="Unpaid Order Checking" camunda:type="external" camunda:topic="unpaid-order-checking">
-      <bpmn:incoming>SequenceFlow_168fhzz</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_14ttodh</bpmn:outgoing>
+    <bpmn:serviceTask id="Task_1fl0nn0" name="Check Refund Response" camunda:type="external" camunda:topic="check-refund-response">
+      <bpmn:incoming>SequenceFlow_09pje4q</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_08fmx0z</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:receiveTask id="ReceiveTask_0cgv5di" name="Receive Refund Notification" messageRef="Message_19dobfw">
+      <bpmn:incoming>SequenceFlow_0cza8jn</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_09pje4q</bpmn:outgoing>
+    </bpmn:receiveTask>
     <bpmn:sendTask id="SendTask_1nkzdff" name="Refund Payment" camunda:type="external" camunda:topic="refund-payment">
       <bpmn:incoming>SequenceFlow_1qnxq4k</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0cza8jn</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:exclusiveGateway id="ExclusiveGateway_1xr8l3a" name="Refund Status">
-      <bpmn:incoming>SequenceFlow_1ej7c9j</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1l8ggk0</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_1pgz7da</bpmn:outgoing>
+    <bpmn:startEvent id="StartEvent_1f4g5p7" name="Receive Input">
+      <bpmn:outgoing>SequenceFlow_11wct4i</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_03ricwk" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="ServiceTask_0rscujp" name="Validate Request" camunda:type="external" camunda:topic="validate-request">
+      <bpmn:incoming>SequenceFlow_11wct4i</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1l73gbf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0disbob" name="Request Validation">
+      <bpmn:incoming>SequenceFlow_1l73gbf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1wtjrb4</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1u8x1w4</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:receiveTask id="ReceiveTask_0cgv5di" name="Receive Refund Notification" messageRef="Message_19dobfw">
-      <bpmn:incoming>SequenceFlow_0cza8jn</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1ej7c9j</bpmn:outgoing>
-    </bpmn:receiveTask>
-    <bpmn:endEvent id="EndEvent_0752ks0" name="Booking Cancelled">
-      <bpmn:incoming>SequenceFlow_1y5pzyu</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sendTask id="SendTask_0r4ryou" name="Notify Cancel Booking Success" camunda:type="external" camunda:topic="notify-booking-cancelled">
-      <bpmn:incoming>SequenceFlow_0m2gi8y</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1y5pzyu</bpmn:outgoing>
-    </bpmn:sendTask>
-    <bpmn:serviceTask id="ServiceTask_0j5rcbt" name="Release Ticket" camunda:type="external" camunda:topic="release-ticket">
-      <bpmn:incoming>SequenceFlow_0xuufhq</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0m2gi8y</bpmn:outgoing>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_19u6qay">
+      <bpmn:incoming>SequenceFlow_1wfv1ih</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_168fhzz</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1qnxq4k</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ServiceTask_1plrizu" name="Paid Order Checking" camunda:type="external" camunda:topic="paid-order-checking">
+      <bpmn:incoming>SequenceFlow_1wtjrb4</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1wfv1ih</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="ServiceTask_0h6bm8c" name="Cancel Order" camunda:type="external" camunda:topic="cancel-order">
       <bpmn:incoming>SequenceFlow_1l8ggk0</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_12h2dw3</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0xuufhq</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ServiceTask_1plrizu" name="Paid Order Checking" camunda:type="external" camunda:topic="paid-order-checking">
-      <bpmn:incoming>SequenceFlow_1wtjrb4</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1wfv1ih</bpmn:outgoing>
+    <bpmn:serviceTask id="ServiceTask_0j5rcbt" name="Release Ticket" camunda:type="external" camunda:topic="release-ticket">
+      <bpmn:incoming>SequenceFlow_0xuufhq</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0m2gi8y</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="ExclusiveGateway_19u6qay">
-      <bpmn:incoming>SequenceFlow_1wfv1ih</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_168fhzz</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_1qnxq4k</bpmn:outgoing>
+    <bpmn:sendTask id="SendTask_0r4ryou" name="Notify Cancel Booking Success" camunda:type="external" camunda:topic="notify-booking-cancelled">
+      <bpmn:incoming>SequenceFlow_0m2gi8y</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1y5pzyu</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="EndEvent_0752ks0" name="Booking Cancelled">
+      <bpmn:incoming>SequenceFlow_1y5pzyu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1xr8l3a" name="Refund Status">
+      <bpmn:incoming>SequenceFlow_08fmx0z</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1l8ggk0</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1pgz7da</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:exclusiveGateway id="ExclusiveGateway_0disbob" name="Request Validation">
-      <bpmn:incoming>SequenceFlow_1l73gbf</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1wtjrb4</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_1u8x1w4</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="ServiceTask_0rscujp" name="Validate Request" camunda:type="external" camunda:topic="validate-request">
-      <bpmn:incoming>SequenceFlow_11wct4i</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1l73gbf</bpmn:outgoing>
+    <bpmn:serviceTask id="Task_08r4275" name="Unpaid Order Checking" camunda:type="external" camunda:topic="unpaid-order-checking">
+      <bpmn:incoming>SequenceFlow_168fhzz</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_14ttodh</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:startEvent id="StartEvent_1f4g5p7" name="Start">
-      <bpmn:outgoing>SequenceFlow_11wct4i</bpmn:outgoing>
-      <bpmn:messageEventDefinition />
-    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1mq4oaw">
+      <bpmn:incoming>SequenceFlow_14ttodh</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_12h2dw3</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1asy5xa</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_15j40vo" name="Cancel Order Failed">
+      <bpmn:incoming>SequenceFlow_18lnbai</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="SendTask_1835lhs" name="Notify Cancel Booking Failed" camunda:type="external" camunda:topic="notify-cancel-booking-failed">
+      <bpmn:incoming>SequenceFlow_1u8x1w4</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1asy5xa</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1pgz7da</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_18lnbai</bpmn:outgoing>
+    </bpmn:sendTask>
   </bpmn:process>
+  <bpmn:message id="Message_03ricwk" name="receive-input" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1w2dzzf">
       <bpmndi:BPMNShape id="Participant_13l95ne_di" bpmnElement="Participant_13l95ne">
@@ -153,7 +159,7 @@
         <di:waypoint x="436" y="1175" />
         <di:waypoint x="465" y="1175" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="394" y="1145" width="24" height="14" />
+          <dc:Bounds x="401" y="1145" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1plrizu_di" bpmnElement="ServiceTask_1plrizu">
@@ -169,8 +175,8 @@
         <dc:Bounds x="1045" y="1247" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="MessageFlow_0zhdfw7_di" bpmnElement="MessageFlow_0zhdfw7">
-        <di:waypoint x="850" y="1423" />
-        <di:waypoint x="850" y="1326" />
+        <di:waypoint x="720" y="1422" />
+        <di:waypoint x="720" y="1326" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_168fhzz_di" bpmnElement="SequenceFlow_168fhzz">
         <di:waypoint x="637" y="1176" />
@@ -208,12 +214,8 @@
         <di:waypoint x="1476" y="1287" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ReceiveTask_0cgv5di_di" bpmnElement="ReceiveTask_0cgv5di">
-        <dc:Bounds x="808" y="1246" width="100" height="80" />
+        <dc:Bounds x="670" y="1246" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1ej7c9j_di" bpmnElement="SequenceFlow_1ej7c9j">
-        <di:waypoint x="908" y="1286" />
-        <di:waypoint x="941" y="1286" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_1xr8l3a_di" bpmnElement="ExclusiveGateway_1xr8l3a" isMarkerVisible="true">
         <dc:Bounds x="941" y="1261" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -228,22 +230,23 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="SendTask_1nkzdff_di" bpmnElement="SendTask_1nkzdff">
-        <dc:Bounds x="650" y="1246" width="100" height="80" />
+        <dc:Bounds x="526" y="1246" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="MessageFlow_0zuevwz_di" bpmnElement="MessageFlow_0zuevwz">
-        <di:waypoint x="700" y="1326" />
-        <di:waypoint x="700" y="1423" />
+        <di:waypoint x="576" y="1326" />
+        <di:waypoint x="576" y="1423" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0cza8jn_di" bpmnElement="SequenceFlow_0cza8jn">
-        <di:waypoint x="750" y="1286" />
-        <di:waypoint x="808" y="1286" />
+        <di:waypoint x="626" y="1286" />
+        <di:waypoint x="670" y="1286" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1qnxq4k_di" bpmnElement="SequenceFlow_1qnxq4k">
         <di:waypoint x="612" y="1201" />
-        <di:waypoint x="612" y="1286" />
-        <di:waypoint x="650" y="1286" />
+        <di:waypoint x="612" y="1224" />
+        <di:waypoint x="576" y="1224" />
+        <di:waypoint x="576" y="1246" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="575" y="1248" width="32" height="27" />
+          <dc:Bounds x="616" y="1202" width="32" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_08vbwim_di" bpmnElement="Task_08r4275">
@@ -308,13 +311,24 @@
       <bpmndi:BPMNShape id="StartEvent_0xu1cua_di" bpmnElement="StartEvent_1f4g5p7">
         <dc:Bounds x="213" y="1091" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="220" y="1134" width="24" height="14" />
+          <dc:Bounds x="198" y="1134" width="68" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="MessageFlow_113dyi5_di" bpmnElement="MessageFlow_113dyi5">
         <di:waypoint x="231" y="934" />
         <di:waypoint x="231" y="1091" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_09pje4q_di" bpmnElement="SequenceFlow_09pje4q">
+        <di:waypoint x="770" y="1286" />
+        <di:waypoint x="807" y="1286" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_08fmx0z_di" bpmnElement="SequenceFlow_08fmx0z">
+        <di:waypoint x="907" y="1286" />
+        <di:waypoint x="941" y="1286" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1m5c61s_di" bpmnElement="Task_1fl0nn0">
+        <dc:Bounds x="807" y="1246" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

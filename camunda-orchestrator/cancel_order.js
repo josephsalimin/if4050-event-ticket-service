@@ -69,7 +69,17 @@ cancelOrderWorker.subscribe('unpaid-order-checking', async function({ task, task
 /* Order status paid */
 cancelOrderWorker.subscribe('refund-payment', async function({ task, taskService }) {
 	/* TODO: Invoke payment service - refund payment */
+	let processVariables = new Variables();
 	console.log(`Did refund-payment. Set variable success=${true}`);
+	await taskService.complete(task, processVariables);
+});
+
+/* Check refund response */
+cancelOrderWorker.subscribe('check-refund-response', async function({ task, taskService}) {
+	/* TODO: Check refund response */
+	let processVariables = new Variables();
+	processVariables.set('success', true);
+	console.log(`Did check-refund-response`);
 	await taskService.complete(task, processVariables);
 });
 
@@ -80,7 +90,9 @@ cancelOrderWorker.subscribe('cancel-order', async function({ task, taskService }
 	let response, listSection;
 	// Set Process Variables
 	let processVariables = new Variables();
-	response = await axios.delete(`${restUrl}/order/${order.id}`);
+	console.log(order);
+	console.log(order.id);
+	response = await axiosInstance.delete(`${restUrl}/order/${order.id}`, {});
 	listSection = response.data;
 	processVariables.set('section_list', listSection);
 	console.log(`Did cancel-order`);
@@ -92,11 +104,13 @@ cancelOrderWorker.subscribe('release-ticket', async function({ task, taskService
 	let listSection = task.variables.get('section_list');
 	let order = task.variables.get('order');
 	let request = {"section_list": listSection};
+	console.log(listSection);
+	console.log(order.id);
 	// Add to capacity for ticket section
-	await axios.post(`${restUrl}/ticket_section/capacity_add`, request);
+	await axiosInstance.post(`${restUrl}/ticket_section/capacity_add`, request);
 	// If order status is paid, then we must delete ticket with that order id
 	if (order.status === 'paid') {
-		await axios.delete(`${restUrl}`, {"order_id": order.id});
+		await axiosInstance.delete(`${restUrl}/ticket`, {"order_id": order.id});
 	}
 	console.log(`Did release-ticket`);
 	await taskService.complete(task);
