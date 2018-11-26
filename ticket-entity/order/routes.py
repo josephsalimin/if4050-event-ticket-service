@@ -12,7 +12,7 @@ order = Blueprint("order_controller", __name__, template_folder="templates")
 @order.before_request
 def before_request():
     # Validate request method and type
-    if request.method != 'GET' and not request.is_json:
+    if (request.method != 'GET' and request.method != 'DELETE') and not request.is_json:
         raise ApplicationException("Must be JSON type")
     # Validate for Authorization
     jwt_token = request.headers.get('Authorization')

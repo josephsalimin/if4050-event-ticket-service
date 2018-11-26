@@ -13,7 +13,7 @@ event = Blueprint("event_controller", __name__, template_folder="templates")
 @event.before_request
 def before_request():
     # Validate request method and type
-    if request.method != 'GET' and not request.is_json:
+    if (request.method != 'GET' and request.method != 'DELETE') and not request.is_json:
         raise ApplicationException("Must be JSON type")
     # Validate for Authorization
     auth = request.headers.get('Authorization')

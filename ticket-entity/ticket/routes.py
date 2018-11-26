@@ -22,7 +22,7 @@ def auth_partner(callback):
 
 def handle_before_request():
     # Validate request method and type
-    if request.method != 'GET' and not request.is_json:
+    if (request.method != 'GET' and request.method != 'DELETE') and not request.is_json:
         raise ApplicationException("Must be JSON type")
     # Validate for Authorization
     jwt_token = request.headers.get('Authorization')
@@ -103,7 +103,7 @@ def validate():
         list_ticket_section = request.json["section_list"]
     except KeyError:
         raise ApplicationException("Wrong input")
-    return validate_ticket_section(list_ticket_section)
+    return jsonify(validate_ticket_section(list_ticket_section))
 
 
 @ticket_section.route("/<int:section_id>", methods=["GET"])

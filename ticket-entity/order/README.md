@@ -24,9 +24,10 @@
 - Output
 ```json5
 {
+  "id": "order_id",
   "user_id": "your_user_id",
   "total_price": "total_price",
-  "status": "order_status",
+  "status": "order_status"
 }
 ```
 
@@ -59,9 +60,10 @@
 - Output
 ```json5
 {
+  "id": "order_id",
   "user_id": "your_user_id",
   "total_price": "total_price",
-  "status": "order_status",
+  "status": "order_status"
 }
 ```
 
