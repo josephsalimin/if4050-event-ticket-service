@@ -6,7 +6,7 @@ from configparser import ConfigParser
 
 from create_event.create_event_service import CreateEventService
 from book_event.book_event_service import BookEventService
-from payment.order_payment_service import OrderPayment
+from payment.order_payment_service import OrderPaymentService
 from cancel_order.cancel_order_service import CancelOrderService
 
 
@@ -20,6 +20,9 @@ class ConfigContext(object):
         self.create_event_url = config["CamundaService"]["create_event_url"]
         self.cancel_order_url = config["CamundaService"]["cancel_order_url"]
         self.book_event_url = config["CamundaService"]["book_event_url"]
+        self.message_url = config["CamundaService"]["message_url"]
+        self.message_name = config["CamundaService"]["message_name"]
+
 
 
 def _on_method_call(ctx):
@@ -27,7 +30,10 @@ def _on_method_call(ctx):
 
 
 CreateEventService.event_manager.add_listener('method_call', _on_method_call)
-application = Application([CreateEventService, BookEventService, OrderPayment, CancelOrderService], 'spyne.ticketx.service',
+BookEventService.event_manager.add_listener('method_call', _on_method_call)
+OrderPaymentService.event_manager.add_listener('method_call', _on_method_call)
+CancelOrderService.event_manager.add_listener('method_call', _on_method_call)
+application = Application([CreateEventService, BookEventService, OrderPaymentService, CancelOrderService], 'spyne.ticketx.service',
                           in_protocol=Soap11(validator='lxml'),
                           out_protocol=Soap11())
 

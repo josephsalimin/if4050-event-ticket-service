@@ -4,7 +4,6 @@ from spyne.model.complex import ComplexModel, Array
 
 class Event(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
-    __type_name__ = 'Event'
 
     name = Unicode
     location = Unicode
@@ -14,9 +13,8 @@ class Event(ComplexModel):
     description = Unicode
 
 
-class Section(ComplexModel):
+class EventSection(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
-    __type_name__ = 'Section'
 
     name = Unicode
     capacity = Integer
@@ -24,23 +22,21 @@ class Section(ComplexModel):
     has_seat = Boolean
 
 
-class CreateEventRequest(ComplexModel):
+class EventTicketRequest(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
-    __type_name__ = 'CreateEventRequest'
 
     event = Event
-    list_section = Array(Section)
+    list_section = Array(EventSection)
     callback_url = Unicode
 
 
-class CreateEventResponse(ComplexModel):
+class EventTicketResp(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
-    __type_name__ = 'CreateEventResponse'
 
     status_code = UnsignedInteger32
     message = Unicode
 
     def __init__(self, status_code, message):
-        super(CreateEventResponse, self).__init__()
+        super(EventTicketResp, self).__init__()
         self.status_code = status_code
         self.message = message

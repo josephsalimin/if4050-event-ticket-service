@@ -1,7 +1,7 @@
 from spyne import ResourceNotFoundError, InternalError
 from spyne.decorator import rpc
 from spyne.service import ServiceBase
-from .models import CancelOrderRequest, CancelOrderResponse
+from .models import CancelOrderRequest, CancelOrderResp
 from utils.payload_builder import build_payload
 import requests
 
@@ -16,7 +16,7 @@ def create_request(order_id, callback_url, auth_key):
 
 
 class CancelOrderService(ServiceBase):
-    @rpc(CancelOrderRequest, _returns=CancelOrderResponse)
+    @rpc(CancelOrderRequest, _returns=CancelOrderResp)
     def CancelOrder(ctx, CancelOrderInput: CancelOrderRequest):
         cancel_order_url = ctx.udc.cancel_order_url
         auth_key = ctx.udc.token
@@ -30,4 +30,4 @@ class CancelOrderService(ServiceBase):
             raise ResourceNotFoundError(camunda_resp)
         elif not camunda_resp.ok:
             raise InternalError(Exception("Spyne Server Error"))
-        return CancelOrderResponse(200, "Processing your input. Detail will be given to your callback URL")
+        return CancelOrderResp(200, "Processing your input. Detail will be given to your callback URL")

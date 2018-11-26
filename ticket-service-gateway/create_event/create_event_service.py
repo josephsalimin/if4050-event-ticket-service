@@ -1,7 +1,7 @@
 from spyne.decorator import rpc
 from spyne.service import ServiceBase
 from spyne.error import InternalError, ResourceNotFoundError
-from .models import CreateEventRequest, CreateEventResponse
+from .models import EventTicketRequest, EventTicketResp
 from utils.payload_builder import build_payload
 import requests
 
@@ -18,8 +18,8 @@ def create_request(event, list_section, callback_url, auth_key):
 
 
 class CreateEventService(ServiceBase):
-    @rpc(CreateEventRequest, _returns=CreateEventResponse)
-    def CreateEvent(ctx, CreateEventInput: CreateEventRequest):
+    @rpc(EventTicketRequest, _returns=EventTicketResp)
+    def CreateEvent(ctx, CreateEventInput: EventTicketRequest):
         create_event_url = ctx.udc.create_event_url
         # Get auth_key, event, list section, callback URL
         auth_key = ctx.udc.token
@@ -35,4 +35,4 @@ class CreateEventService(ServiceBase):
             raise ResourceNotFoundError(camunda_resp)
         elif not camunda_resp.ok:
             raise InternalError(Exception("Spyne Server Error"))
-        return CreateEventResponse(200, "Processing your input. Detail will be given to your callback URL")
+        return EventTicketResp(200, "Processing your input. Detail will be given to your callback URL")

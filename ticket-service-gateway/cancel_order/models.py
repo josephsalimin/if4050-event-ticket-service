@@ -9,13 +9,13 @@ class CancelOrderRequest(ComplexModel):
     callback_url = Unicode
 
 
-class CancelOrderResponse(ComplexModel):
+class CancelOrderResp(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
 
     status_code = UnsignedInteger32
     message = Unicode
 
     def __init__(self, status_code, message):
-        super(CancelOrderResponse, self).__init__()
+        super(CancelOrderResp, self).__init__()
         self.status_code = status_code
         self.message = message

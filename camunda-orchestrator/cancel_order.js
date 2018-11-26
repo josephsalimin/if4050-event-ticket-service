@@ -23,7 +23,6 @@ cancelOrderWorker.subscribe('validate-request', async function({ task, taskServi
 	if (orderID && authKey && callbackURL) {
 		axiosOptions.headers = {'Authorization': authKey, 'Content-Type': 'application/json'};
 		axiosInstance = axios.create(axiosOptions);
-		console.log(axiosInstance);
 		try {
 			let response = await axiosInstance.get(`${restUrl}/order/${orderID}`);
 			if (response.status === 200) {
@@ -92,8 +91,6 @@ cancelOrderWorker.subscribe('cancel-order', async function({ task, taskService }
 	let response, listSection;
 	// Set Process Variables
 	let processVariables = new Variables();
-	console.log(order);
-	console.log(order.id);
 	response = await axiosInstance.delete(`${restUrl}/order/${order.id}`, {});
 	listSection = response.data;
 	processVariables.set('section_list', listSection);
@@ -106,13 +103,11 @@ cancelOrderWorker.subscribe('release-ticket', async function({ task, taskService
 	let listSection = task.variables.get('section_list');
 	let order = task.variables.get('order');
 	let request = {"section_list": listSection};
-	console.log(listSection);
-	console.log(order.id);
 	// Add to capacity for ticket section
 	await axiosInstance.post(`${restUrl}/ticket_section/capacity_add`, request);
 	// If order status is paid, then we must delete ticket with that order id
 	if (order.status === 'paid') {
-		await axiosInstance.delete(`${restUrl}/ticket`, {"order_id": order.id});
+		await axiosInstance.delete(`${restUrl}/ticket`, {body: {"order_id": order.id}});
 	}
 	console.log(`Did release-ticket`);
 	await taskService.complete(task);

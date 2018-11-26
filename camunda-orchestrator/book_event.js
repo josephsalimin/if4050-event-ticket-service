@@ -109,7 +109,7 @@ bookEventWorker.subscribe('cancel-booking', async function({ task, taskService }
 	let order_id = task.variables.get('order_id');
 	console.log(order_id);
 	console.log(restUrl+`/order/${order_id}`);
-	let response = await axiosInstance.delete(restUrl+`/order/${order_id}`);
+	let response = await instance.delete(restUrl+`/order/${order_id}`);
 	console.log(`Did cancel-booking.`);
 	await taskService.complete(task);
 });
@@ -127,8 +127,13 @@ bookEventWorker.subscribe('release-event-ticket', async function({ task, taskSer
 /* Payment Request Received */
 bookEventWorker.subscribe('validate-payment-request', async function({ task, taskService }) {
 	// TODO: validate
+	let order_id = task.variables.get('order_id');
+	let response = await instance.get(`${restUrl}/order/${order_id}`);
 	let processVariables = new Variables();
 	processVariables.set('paymentValidated', true);
+	if (response.data.status === 'cancelled') {
+		processVariables.set('paymentValidate', false);
+	}
 	console.log(`Did validate-payment-request.`);
 	await taskService.complete(task, processVariables);
 });
