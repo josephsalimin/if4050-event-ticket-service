@@ -73,11 +73,11 @@
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:serviceTask id="Task_00ws2gl" name="Cancel Order" camunda:type="external" camunda:topic="cancel-order">
+    <bpmn:serviceTask id="Task_00ws2gl" name="Cancel Booking" camunda:type="external" camunda:topic="cancel-booking">
       <bpmn:incoming>SequenceFlow_08iiwjg</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1w5ovbf</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_1xbhf9e" name="Release Ticket" camunda:type="external" camunda:topic="release-ticket">
+    <bpmn:serviceTask id="Task_1xbhf9e" name="Release Ticket" camunda:type="external" camunda:topic="release-event-ticket">
       <bpmn:incoming>SequenceFlow_1w5ovbf</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0cr4uye</bpmn:outgoing>
     </bpmn:serviceTask>

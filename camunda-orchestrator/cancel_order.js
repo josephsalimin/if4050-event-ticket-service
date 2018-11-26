@@ -8,7 +8,8 @@ const restUrl = 'http://localhost:5050';
 // Create a Client instance with custom configuration
 let config = { baseUrl };
 let cancelOrderWorker = new Client(config);
-let axiosOptions = {}, axiosInstance;
+let axiosOptions = {};
+let axiosInstance;
 
 cancelOrderWorker.subscribe('validate-request', async function({ task, taskService }) {
 	// Get all variables
@@ -22,6 +23,7 @@ cancelOrderWorker.subscribe('validate-request', async function({ task, taskServi
 	if (orderID && authKey && callbackURL) {
 		axiosOptions.headers = {'Authorization': authKey, 'Content-Type': 'application/json'};
 		axiosInstance = axios.create(axiosOptions);
+		console.log(axiosInstance);
 		try {
 			let response = await axiosInstance.get(`${restUrl}/order/${orderID}`);
 			if (response.status === 200) {
@@ -126,10 +128,10 @@ cancelOrderWorker.subscribe('notify-cancel-booking-failed', async function({ tas
 });
 
 /* Notify Cancel Success*/
-cancelOrderWorker.subscribe('notify-booking-cancelled', async function({ task, taskService }) {
+cancelOrderWorker.subscribe('notify-order-cancelled', async function({ task, taskService }) {
 	let callbackURL = task.variables.get("callback_url");
 	/* TODO: throw message to callback URL */
-	console.log(`Did notify-booking-cancelled`);
+	console.log(`Did notify-order-cancelled`);
 	await taskService.complete(task);
 });
 

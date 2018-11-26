@@ -105,20 +105,22 @@ bookEventWorker.subscribe('reserve-ticket', async function({ task, taskService }
 });
 
 /* No Payment Request */
-bookEventWorker.subscribe('cancel-order', async function({ task, taskService }) {
+bookEventWorker.subscribe('cancel-booking', async function({ task, taskService }) {
 	let order_id = task.variables.get('order_id');
 	console.log(order_id);
 	console.log(restUrl+`/order/${order_id}`);
-	let response = await instance.delete(restUrl+`/order/${order_id}`);
-	console.log(`Did cancel-order.`);
+	let response = await axiosInstance.delete(restUrl+`/order/${order_id}`);
+	console.log(`Did cancel-booking.`);
 	await taskService.complete(task);
 });
 
-bookEventWorker.subscribe('release-ticket', async function({ task, taskService }) {
+bookEventWorker.subscribe('release-event-ticket', async function({ task, taskService }) {
 	let section_list = task.variables.get('section_list');
-	console.log(section_list);
+	section_list = {
+		"section_list": section_list
+	};
 	let response = await instance.post(restUrl+'/ticket_section/capacity_reduce', section_list);
-	console.log(`Did release-ticket.`);
+	console.log(`Did release-event-ticket.`);
 	await taskService.complete(task);
 });
 

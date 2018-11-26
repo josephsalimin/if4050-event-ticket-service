@@ -91,7 +91,7 @@
       <bpmn:incoming>SequenceFlow_0xuufhq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0m2gi8y</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sendTask id="SendTask_0r4ryou" name="Notify Cancel Booking Success" camunda:type="external" camunda:topic="notify-booking-cancelled">
+    <bpmn:sendTask id="SendTask_0r4ryou" name="Notify Cancel Booking Success" camunda:type="external" camunda:topic="notify-order-cancelled">
       <bpmn:incoming>SequenceFlow_0m2gi8y</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1y5pzyu</bpmn:outgoing>
     </bpmn:sendTask>
