@@ -8,6 +8,7 @@ class CancelOrderRequest(ComplexModel):
     order_id = Integer
     callback = Unicode
     callback_type = Unicode
+    payment_method = Unicode
 
 
 class CancelOrderResp(ComplexModel):

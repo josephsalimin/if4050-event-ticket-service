@@ -15,12 +15,14 @@ cancelOrderWorker.subscribe('validate-request', async function({ task, taskServi
 	// Get all variables
 	let orderID = task.variables.get('order_id');
 	let authKey = task.variables.get('auth_key');
-	let callbackURL = task.variables.get("callback_url");
+	let method = task.variables.get('payment_method');
+	let callback = task.variables.get("callback");
+	let callbackType = task.variables.get("callback_type");
 	let status = false, error = "Error";
 	// Set Process Variables
 	let processVariables = new Variables();
 	// Validate order data
-	if (orderID && authKey && callbackURL) {
+	if (orderID && authKey && callback && callbackType && method) {
 		axiosOptions.headers = {'Authorization': authKey, 'Content-Type': 'application/json'};
 		axiosInstance = axios.create(axiosOptions);
 		try {
@@ -28,7 +30,6 @@ cancelOrderWorker.subscribe('validate-request', async function({ task, taskServi
 			if (response.status === 200) {
 				status = true;
 				processVariables.set('order', response.data);
-				processVariables.set('auth_key', authKey);
 			} 
 		} catch(err) {
 			error = err.message;
@@ -69,20 +70,58 @@ cancelOrderWorker.subscribe('unpaid-order-checking', async function({ task, task
 
 /* Order status paid */
 cancelOrderWorker.subscribe('refund-payment', async function({ task, taskService }) {
-	/* TODO: Invoke payment service - refund payment */
+	let processVariables = new Variables();
+	let method = task.variables.get('payment_method');
+	let order = task.variables.get('order');
+	let res = await beginPayment(method, order.total_price);
+	processVariables.set('payment_id', res.paymentId);
+	let loop = true;
+	while (loop) {
+		let res = await getPaymentEvents(res.paymentId);
+		if (res.lastEventId) {
+			let events = res.events;
+			processVariables.set('last_event_id', res.lastEventId);
+			if (events[0].type === 'OPEN_URL') {
+				processVariables.set('payment_type', 'url');
+				processVariables.set('payment_data', events[0].urlToOpen);
+			} else {
+				processVariables.set('payment_type', 'acc');
+				processVariables.set('payment_data', events[0].accountNumber);
+			}
+			loop = false;
+		}
+	}
 	await taskService.complete(task);
 });
 
 cancelOrderWorker.subscribe('notify-refund', async function({ task, taskService }) {
-	/* TODO: Invoke payment service - refund payment */
+	let callbackType = task.variables.get("callback_type");
+	let callback = task.variables.get("callback");
 	console.log(`Did notify-refund.`);
 	await taskService.complete(task);
 });
 
 cancelOrderWorker.subscribe('waiting-refund', async function({ task, taskService }) {
-	/* TODO: Invoke payment service - refund payment */
+	let lastEventId = task.variables.get('last_event_id');
+	let paymentId = task.variables.get('payment_id');
+	let loop = true;
 	let processVariables = new Variables();
-	console.log(`Did refund-payment. Set variable success=${true}`);
+	while (loop) {
+		let res = await getPaymentEvents(paymentId, lastEventId);
+		let lastId = res.lastEventId;
+		let events = res.events;
+		if (events) {
+			let event = events.find(x => (x.paymentEventId === lastId));
+			if (event.type === 'SUCCESS') {
+				processVariables.set('success', true);
+				loop = false;
+			} else if (event.type === 'FAILURE') {
+				processVariables.set('success', false);
+				processVariables.set('message_error', 'Refund Failure. Try Again');
+				loop = false;
+			}
+		}
+	}
 	console.log(`Did waiting-refund.`);
 	await taskService.complete(task, processVariables);
 });
@@ -127,17 +166,29 @@ cancelOrderWorker.subscribe('release-ticket', async function({ task, taskService
 
 /* Notify Cancel Failed */
 cancelOrderWorker.subscribe('notify-cancel-booking-failed', async function({ task, taskService }) {
-	let callbackURL = task.variables.get("callback_url");
+	let callbackType = task.variables.get("callback_type");
+	let callback = task.variables.get("callback");
 	let error = task.variables.get("message_error");
-	/* TODO: throw message to callback URL */
+	if (callbackType === 'url') {
+		await axiosInstance.post(callback, {
+			"message": error
+		});
+	}
 	console.log(`Did notify-cancel-booking-failed. error: ${error}`);
 	await taskService.complete(task);
 });
 
 /* Notify Cancel Success*/
 cancelOrderWorker.subscribe('notify-order-cancelled', async function({ task, taskService }) {
-	let callbackURL = task.variables.get("callback_url");
-	/* TODO: throw message to callback URL */
+	let callbackType = task.variables.get("callback_type");
+	let callback = task.variables.get("callback");
+	let order = task.variables.get("order");
+	if (callbackType === 'url') {
+		await axiosInstance.post(callback, {
+			"message": "order cancelled",
+			"order": order
+		});
+	}
 	console.log(`Did notify-order-cancelled`);
 	await taskService.complete(task);
 });

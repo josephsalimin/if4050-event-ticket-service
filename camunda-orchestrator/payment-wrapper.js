@@ -9,7 +9,7 @@ async function getPaymentMethods() {
     let client = await soap.createClientAsync(url, soap_client_options);
     let args = {}
     let result = await client.getPaymentMethodsAsync(args);
-    return result;
+    return result.return;
 }
 
 async function beginPayment(paymentMethodId, amount) {
@@ -19,7 +19,7 @@ async function beginPayment(paymentMethodId, amount) {
         "amount" : amount
     }
     let result = await client.beginPaymentAsync(args);
-    return result;
+    return result.return;
 }
 
 async function getPaymentEvents(paymentId, lastEventId) {
@@ -29,13 +29,7 @@ async function getPaymentEvents(paymentId, lastEventId) {
         "amount" : amount
     }
     let result = await client.getPaymentEventsAsync(args);
-    return result;
+    return result.return;
 }
-
-getPaymentMethods().then((res) => {
-    console.log(res);
-}).catch(err => {
-    console.log(err.body);
-});
 
 module.exports = {getPaymentMethods, beginPayment, getPaymentEvents}

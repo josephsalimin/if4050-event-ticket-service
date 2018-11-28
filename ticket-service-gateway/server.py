@@ -25,7 +25,6 @@ class ConfigContext(object):
         self.message_name = config["CamundaService"]["message_name"]
 
 
-
 def _on_method_call(ctx):
     ctx.udc = ConfigContext()
 
