@@ -6,15 +6,13 @@
     <bpmn:participant id="Participant_13l95ne" name="Cancel Order" processRef="order-cancel" />
     <bpmn:participant id="Participant_1t12xc1" name="Payment Gateway" />
     <bpmn:participant id="Participant_0gnougc" name="Customer" />
-    <bpmn:messageFlow id="MessageFlow_0zhdfw7" sourceRef="Participant_1t12xc1" targetRef="ReceiveTask_0cgv5di" />
     <bpmn:messageFlow id="MessageFlow_019grbt" sourceRef="SendTask_0r4ryou" targetRef="Participant_0gnougc" />
     <bpmn:messageFlow id="MessageFlow_0zuevwz" sourceRef="SendTask_1nkzdff" targetRef="Participant_1t12xc1" />
     <bpmn:messageFlow id="MessageFlow_1drfwji" sourceRef="SendTask_1835lhs" targetRef="Participant_0gnougc" />
     <bpmn:messageFlow id="MessageFlow_113dyi5" sourceRef="Participant_0gnougc" targetRef="StartEvent_1f4g5p7" />
   </bpmn:collaboration>
   <bpmn:process id="order-cancel" name="Cancel Order" isExecutable="true">
-    <bpmn:sequenceFlow id="SequenceFlow_08fmx0z" sourceRef="Task_1fl0nn0" targetRef="ExclusiveGateway_1xr8l3a" />
-    <bpmn:sequenceFlow id="SequenceFlow_09pje4q" sourceRef="ReceiveTask_0cgv5di" targetRef="Task_1fl0nn0" />
+    <bpmn:sequenceFlow id="SequenceFlow_08fmx0z" sourceRef="Task_1fl0nn0" targetRef="ServiceTask_1l0yijb" />
     <bpmn:sequenceFlow id="SequenceFlow_11wct4i" sourceRef="StartEvent_1f4g5p7" targetRef="ServiceTask_0rscujp" />
     <bpmn:sequenceFlow id="SequenceFlow_1l73gbf" sourceRef="ServiceTask_0rscujp" targetRef="ExclusiveGateway_0disbob" />
     <bpmn:sequenceFlow id="SequenceFlow_1wtjrb4" name="Valid" sourceRef="ExclusiveGateway_0disbob" targetRef="ServiceTask_1plrizu">
@@ -30,7 +28,6 @@
     <bpmn:sequenceFlow id="SequenceFlow_1l8ggk0" name="Success" sourceRef="ExclusiveGateway_1xr8l3a" targetRef="ServiceTask_0h6bm8c">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${success}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="SequenceFlow_0cza8jn" sourceRef="SendTask_1nkzdff" targetRef="ReceiveTask_0cgv5di" />
     <bpmn:sequenceFlow id="SequenceFlow_1qnxq4k" name="Status&#10;Paid" sourceRef="ExclusiveGateway_19u6qay" targetRef="SendTask_1nkzdff">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paid}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -48,17 +45,9 @@
     <bpmn:sequenceFlow id="SequenceFlow_1pgz7da" name="Failed" sourceRef="ExclusiveGateway_1xr8l3a" targetRef="SendTask_1835lhs">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!success}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="Task_1fl0nn0" name="Check Refund Response" camunda:type="external" camunda:topic="check-refund-response">
-      <bpmn:incoming>SequenceFlow_09pje4q</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_08fmx0z</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:receiveTask id="ReceiveTask_0cgv5di" name="Receive Refund Notification" messageRef="Message_19dobfw">
-      <bpmn:incoming>SequenceFlow_0cza8jn</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_09pje4q</bpmn:outgoing>
-    </bpmn:receiveTask>
     <bpmn:sendTask id="SendTask_1nkzdff" name="Refund Payment" camunda:type="external" camunda:topic="refund-payment">
       <bpmn:incoming>SequenceFlow_1qnxq4k</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0cza8jn</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0qq4s0j</bpmn:outgoing>
     </bpmn:sendTask>
     <bpmn:startEvent id="StartEvent_1f4g5p7" name="Receive Input">
       <bpmn:outgoing>SequenceFlow_11wct4i</bpmn:outgoing>
@@ -99,7 +88,7 @@
       <bpmn:incoming>SequenceFlow_1y5pzyu</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:exclusiveGateway id="ExclusiveGateway_1xr8l3a" name="Refund Status">
-      <bpmn:incoming>SequenceFlow_08fmx0z</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0w3094r</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1l8ggk0</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_1pgz7da</bpmn:outgoing>
     </bpmn:exclusiveGateway>
@@ -121,6 +110,16 @@
       <bpmn:incoming>SequenceFlow_1pgz7da</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_18lnbai</bpmn:outgoing>
     </bpmn:sendTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0qq4s0j" sourceRef="SendTask_1nkzdff" targetRef="Task_1fl0nn0" />
+    <bpmn:serviceTask id="Task_1fl0nn0" name="Notify Server" camunda:type="external" camunda:topic="notify-refund">
+      <bpmn:incoming>SequenceFlow_0qq4s0j</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_08fmx0z</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ServiceTask_1l0yijb" name="Waiting Refund" camunda:type="external" camunda:topic="waiting-refund">
+      <bpmn:incoming>SequenceFlow_08fmx0z</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0w3094r</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0w3094r" sourceRef="ServiceTask_1l0yijb" targetRef="ExclusiveGateway_1xr8l3a" />
   </bpmn:process>
   <bpmn:message id="Message_03ricwk" name="receive-input" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -174,10 +173,6 @@
       <bpmndi:BPMNShape id="ServiceTask_0h6bm8c_di" bpmnElement="ServiceTask_0h6bm8c">
         <dc:Bounds x="1045" y="1247" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="MessageFlow_0zhdfw7_di" bpmnElement="MessageFlow_0zhdfw7">
-        <di:waypoint x="720" y="1422" />
-        <di:waypoint x="720" y="1326" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_168fhzz_di" bpmnElement="SequenceFlow_168fhzz">
         <di:waypoint x="637" y="1176" />
         <di:waypoint x="709" y="1175" />
@@ -213,9 +208,6 @@
         <di:waypoint x="1425" y="1287" />
         <di:waypoint x="1476" y="1287" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ReceiveTask_0cgv5di_di" bpmnElement="ReceiveTask_0cgv5di">
-        <dc:Bounds x="670" y="1246" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_1xr8l3a_di" bpmnElement="ExclusiveGateway_1xr8l3a" isMarkerVisible="true">
         <dc:Bounds x="941" y="1261" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -235,10 +227,6 @@
       <bpmndi:BPMNEdge id="MessageFlow_0zuevwz_di" bpmnElement="MessageFlow_0zuevwz">
         <di:waypoint x="576" y="1326" />
         <di:waypoint x="576" y="1423" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0cza8jn_di" bpmnElement="SequenceFlow_0cza8jn">
-        <di:waypoint x="626" y="1286" />
-        <di:waypoint x="670" y="1286" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1qnxq4k_di" bpmnElement="SequenceFlow_1qnxq4k">
         <di:waypoint x="612" y="1201" />
@@ -318,17 +306,24 @@
         <di:waypoint x="231" y="934" />
         <di:waypoint x="231" y="1091" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_09pje4q_di" bpmnElement="SequenceFlow_09pje4q">
-        <di:waypoint x="770" y="1286" />
-        <di:waypoint x="807" y="1286" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_08fmx0z_di" bpmnElement="SequenceFlow_08fmx0z">
-        <di:waypoint x="907" y="1286" />
-        <di:waypoint x="941" y="1286" />
+        <di:waypoint x="763" y="1286" />
+        <di:waypoint x="800" y="1286" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1m5c61s_di" bpmnElement="Task_1fl0nn0">
-        <dc:Bounds x="807" y="1246" width="100" height="80" />
+        <dc:Bounds x="663" y="1246" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qq4s0j_di" bpmnElement="SequenceFlow_0qq4s0j">
+        <di:waypoint x="626" y="1286" />
+        <di:waypoint x="663" y="1286" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1l0yijb_di" bpmnElement="ServiceTask_1l0yijb">
+        <dc:Bounds x="800" y="1246" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0w3094r_di" bpmnElement="SequenceFlow_0w3094r">
+        <di:waypoint x="900" y="1286" />
+        <di:waypoint x="941" y="1286" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

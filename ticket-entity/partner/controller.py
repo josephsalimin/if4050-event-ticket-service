@@ -24,13 +24,11 @@ def create_partner(name, address, email, contact_number):
     return partner.to_dict()
 
 
-def get_list_partner(name):
+def get_list_partner():
     """
-    Get list partner by name
-    :param name: string
+    Get list partner by 
     :return: array of dict
     """
-    partners = Partner.select().where(Partner.name.contains(name.lower()))
     response = [partner.to_dict() for partner in partners]
     return response
 

@@ -29,10 +29,6 @@
 
 #### /partner/
 - Method: GET
-- Parameter
-```
-- name [OPTIONAL] 
-```
 - Output
 ```json5
 [

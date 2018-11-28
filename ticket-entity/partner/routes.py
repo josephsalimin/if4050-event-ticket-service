@@ -75,7 +75,4 @@ def update(partner_id):
 @partner.route("/", methods=["GET"])
 @partner.route("", methods=["GET"])
 def read_list_partner():
-    name = request.args.get("name", None)
-    if name is None or name == "":
-        return jsonify([])
-    return jsonify(get_list_partner(name))
+    return jsonify(get_list_partner())
