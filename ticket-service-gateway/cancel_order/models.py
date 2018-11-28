@@ -3,7 +3,7 @@ from spyne.model.complex import ComplexModel, Iterable
 
 
 class CancelOrderRequest(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.cancel'
 
     order_id = Integer
     callback = Unicode
@@ -11,7 +11,7 @@ class CancelOrderRequest(ComplexModel):
 
 
 class CancelOrderResp(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.cancel'
 
     status_code = UnsignedInteger32
     message = Unicode

@@ -13,9 +13,9 @@ def create_request(user_id, order_id, instance_id, callback, callback_type, paym
     payload = {
         'auth_key': auth_key,
         'user_id': user_id,
-        'order_id': order_id,
-        'callback': callback,
-        'callback_type': callback_type,
+        'order_id_pymt': order_id,
+        'callback_pymt': callback,
+        'callback_pymt_type': callback_type,
         'payment_method': payment_method
     }
     payload = build_payload(payload)

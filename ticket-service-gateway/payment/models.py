@@ -3,7 +3,7 @@ from spyne.model.complex import ComplexModel, Iterable
 
 
 class OrderPaymentRequest(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.book'
 
     user_id = Integer
     order_id = Integer
@@ -14,7 +14,7 @@ class OrderPaymentRequest(ComplexModel):
 
 
 class OrderPaymentResp(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.book'
 
     status_code = UnsignedInteger32
     message = Unicode

@@ -2,6 +2,7 @@ from wsgiref.simple_server import make_server
 from spyne.application import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
+from spyne.util.wsgi_wrapper import WsgiMounter
 from configparser import ConfigParser
 
 from create_event.create_event_service import CreateEventService
@@ -33,12 +34,21 @@ CreateEventService.event_manager.add_listener('method_call', _on_method_call)
 BookEventService.event_manager.add_listener('method_call', _on_method_call)
 OrderPaymentService.event_manager.add_listener('method_call', _on_method_call)
 CancelOrderService.event_manager.add_listener('method_call', _on_method_call)
-application = Application([CreateEventService, BookEventService, OrderPaymentService, CancelOrderService], 'spyne.ticketx.service',
+application_1 = Application([CreateEventService], 'spyne.ticketx.event',
                           in_protocol=Soap11(validator='lxml'),
                           out_protocol=Soap11())
+application_2 = Application([CancelOrderService], 'spyne.ticketx.cancel',
+                          in_protocol=Soap11(validator='lxml'),
+                          out_protocol=Soap11())
+application_3 = Application([BookEventService, OrderPaymentService], 'spyne.ticketx.book',
+                          in_protocol=Soap11(validator='lxml'),
+                          out_protocol=Soap11())           
 
-wsgi_application = WsgiApplication(application)
-
+wsgi_application = WsgiMounter({
+    'create_event': application_1,
+    'cancel_order': application_2,
+    'book_event': application_3
+})
 
 if __name__ == '__main__':
     server = make_server('127.0.0.1', 8000, wsgi_application)

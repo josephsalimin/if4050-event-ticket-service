@@ -3,7 +3,7 @@ from spyne.model.complex import ComplexModel, Iterable
 
 
 class BookEventSection(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.book'
 
     id = UnsignedInteger32
     quantity = UnsignedInteger32
@@ -11,7 +11,7 @@ class BookEventSection(ComplexModel):
 
 
 class BookEventRequest(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.book'
 
     user_id = Integer
     section_list = Iterable(BookEventSection)
@@ -20,7 +20,7 @@ class BookEventRequest(ComplexModel):
 
 
 class BookEventResp(ComplexModel):
-    __namespace__ = 'spyne.ticketx.service'
+    __namespace__ = 'spyne.ticketx.book'
 
     instance_id = Unicode
     status_code = UnsignedInteger32
