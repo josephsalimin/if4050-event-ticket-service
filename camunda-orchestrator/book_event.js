@@ -126,7 +126,6 @@ bookEventWorker.subscribe('release-event-ticket', async function({ task, taskSer
 
 /* Payment Request Received */
 bookEventWorker.subscribe('validate-payment-request', async function({ task, taskService }) {
-	// TODO: validate
 	let order_id = task.variables.get('order_id');
 	let response = await instance.get(`${restUrl}/order/${order_id}`);
 	let processVariables = new Variables();
@@ -140,20 +139,25 @@ bookEventWorker.subscribe('validate-payment-request', async function({ task, tas
 
 bookEventWorker.subscribe('send-payment-request', async function({ task, taskService }) {
 	// TODO: SOAP
-	let processVariables = new Variables();
-	// processVariables.set('paymentSuccess', true);
 	console.log(`Did send-payment-request.`);
-	await taskService.complete(task, processVariables);
+	await taskService.complete(task);
 });
 
-bookEventWorker.subscribe('check-payment-response', async function({ task, taskService }) {
-	// TODO: check input
+bookEventWorker.subscribe('notify-payment-invoice', async function({ task, taskService }) {
+	// TODO: send link to user
+	console.log(`Did notify-payment-invoice.`);
+	await taskService.complete(task);
+});
+
+bookEventWorker.subscribe('wait-payment', async function({ task, taskService }) {
+	// TODO: get payment status
 	let processVariables = new Variables();
 	processVariables.set('paymentSuccess', true)
-	console.log(`Did check-payment-response.`);
+	console.log(`Did wait-payment.`);
 	await taskService.complete(task, processVariables);
 });
 
+/* Payment Success */
 bookEventWorker.subscribe('set-order-to-paid', async function({ task, taskService }) {
 	let order_id = task.variables.get('order_id');
 	let response = await instance.put(restUrl+`/order/${order_id}`);

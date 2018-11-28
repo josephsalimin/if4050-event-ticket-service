@@ -70,8 +70,20 @@ cancelOrderWorker.subscribe('unpaid-order-checking', async function({ task, task
 /* Order status paid */
 cancelOrderWorker.subscribe('refund-payment', async function({ task, taskService }) {
 	/* TODO: Invoke payment service - refund payment */
+	await taskService.complete(task);
+});
+
+cancelOrderWorker.subscribe('notify-refund', async function({ task, taskService }) {
+	/* TODO: Invoke payment service - refund payment */
+	console.log(`Did notify-refund.`);
+	await taskService.complete(task);
+});
+
+cancelOrderWorker.subscribe('waiting-refund', async function({ task, taskService }) {
+	/* TODO: Invoke payment service - refund payment */
 	let processVariables = new Variables();
 	console.log(`Did refund-payment. Set variable success=${true}`);
+	console.log(`Did waiting-refund.`);
 	await taskService.complete(task, processVariables);
 });
 
