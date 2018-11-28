@@ -1,34 +1,41 @@
 var soap = require('soap');
 var url = 'http://167.205.35.211:8080/easypay/PaymentService?wsdl';
-var args = {name: 'value'};
+let request = require('request');
+let request_with_defaults = request.defaults({'proxy': process.env.http_proxy});
+let soap_client_options = {'request': request_with_defaults};
 
-function getPaymentMethods(){
-    soap.createClient(url, function(err, client) {
-        let args= {};
-        client.getPaymentMethods(args, function(err, result) {
-            console.log(result.return);
-        });
-    });
+
+async function getPaymentMethods() {
+    let client = await soap.createClientAsync(url, soap_client_options);
+    let args = {}
+    let result = await client.getPaymentMethodsAsync(args);
+    return result;
 }
 
-function beginPayment(paymentMethodId, amount, callback){
-    soap.createClient(url, function(err, client){
-        let args = {
-            "paymentMethodId" : paymentMethodId, 
-            "amount" : amount
-        }
-        client.beginPayment(args, callback);
-    });
+async function beginPayment(paymentMethodId, amount) {
+    let client = await soap.createClientAsync(url, soap_client_options);
+    let args = {
+        "paymentMethodId" : paymentMethodId, 
+        "amount" : amount
+    }
+    let result = await client.beginPaymentAsync(args);
+    return result;
 }
 
-function getPaymentEvents(paymentId, lastEventId, callback){
-    soap.createClient(url, function(err, client){
-        let args = {
-            "paymentId" : paymentId, 
-            "lastEventId" : lastEventId
-        }
-        client.getPaymentEvents(args, callback);
-    });
+async function getPaymentEvents(paymentId, lastEventId) {
+    let client = await soap.createClientAsync(url, soap_client_options);
+    let args = {
+        "paymentMethodId" : paymentMethodId, 
+        "amount" : amount
+    }
+    let result = await client.getPaymentEventsAsync(args);
+    return result;
 }
+
+getPaymentMethods().then((res) => {
+    console.log(res);
+}).catch(err => {
+    console.log(err.body);
+});
 
 module.exports = {getPaymentMethods, beginPayment, getPaymentEvents}
