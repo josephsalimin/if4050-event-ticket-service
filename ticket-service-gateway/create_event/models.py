@@ -27,7 +27,8 @@ class EventTicketRequest(ComplexModel):
 
     event = Event
     list_section = Array(EventSection)
-    callback_url = Unicode
+    callback = Unicode
+    callback_type = Unicode
 
 
 class EventTicketResp(ComplexModel):

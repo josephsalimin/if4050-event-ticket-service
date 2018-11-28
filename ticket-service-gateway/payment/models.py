@@ -8,7 +8,9 @@ class OrderPaymentRequest(ComplexModel):
     user_id = Integer
     order_id = Integer
     instance_id = Unicode
-    callback_url = Unicode
+    payment_method = Unicode
+    callback = Unicode
+    callback_type = Unicode
 
 
 class OrderPaymentResp(ComplexModel):

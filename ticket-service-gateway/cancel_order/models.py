@@ -6,7 +6,8 @@ class CancelOrderRequest(ComplexModel):
     __namespace__ = 'spyne.ticketx.service'
 
     order_id = Integer
-    callback_url = Unicode
+    callback = Unicode
+    callback_type = Unicode
 
 
 class CancelOrderResp(ComplexModel):

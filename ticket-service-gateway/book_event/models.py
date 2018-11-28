@@ -15,7 +15,8 @@ class BookEventRequest(ComplexModel):
 
     user_id = Integer
     section_list = Iterable(BookEventSection)
-    callback_url = Unicode
+    callback = Unicode
+    callback_type = Unicode
 
 
 class BookEventResp(ComplexModel):

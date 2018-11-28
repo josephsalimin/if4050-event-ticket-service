@@ -1,4 +1,4 @@
-from spyne import ResourceNotFoundError, InternalError
+from spyne import ResourceNotFoundError, InternalError, ArgumentError
 from spyne.decorator import rpc 
 from spyne.model.complex import Iterable
 from spyne.model.primitive import Unicode, Boolean, Integer
@@ -9,12 +9,14 @@ from utils.payload_builder import build_payload
 import requests
 
 
-def create_request(user_id, order_id, instance_id, callback_url, auth_key, message_name):
+def create_request(user_id, order_id, instance_id, callback, callback_type, payment_method, auth_key, message_name):
     payload = {
         'auth_key': auth_key,
         'user_id': user_id,
         'order_id': order_id,
-        'callback_url': callback_url
+        'callback': callback,
+        'callback_type': callback_type,
+        'payment_method': payment_method
     }
     payload = build_payload(payload)
     payload['processInstanceId'] = instance_id
@@ -24,17 +26,21 @@ def create_request(user_id, order_id, instance_id, callback_url, auth_key, messa
 
 class OrderPaymentService(ServiceBase):
     @rpc(OrderPaymentRequest, _returns=OrderPaymentResp)
-    def OrderPayment(ctx, payment_request: OrderPaymentRequest):
+    def OrderPayment(ctx, PaymentInput: OrderPaymentRequest):
         message_url = ctx.udc.message_url
         message_name = ctx.udc.message_name
         auth_key = ctx.udc.token
-        # Get user_id, order_id, instance_id, and callback_url
-        user_id = payment_request.user_id
-        order_id = payment_request.order_id
-        instance_id = payment_request.instance_id
-        callback_url = payment_request.callback_url
+        # Get user_id, order_id, instance_id, and callback
+        user_id = PaymentInput.user_id
+        order_id = PaymentInput.order_id
+        instance_id = PaymentInput.instance_id
+        callback = PaymentInput.callback
+        callback_type = PaymentInput.callback_type
+        payment_method = PaymentInput.payment_method
+        if (payment_method != 'ovo' and payment_method != 'go_pay' and payment_method != 'bank' and payment_method != 'bank_va'):
+            raise ArgumentError("Payment method not available")
         # Create payload
-        payload = create_request(user_id, order_id, instance_id, callback_url, auth_key, message_name)
+        payload = create_request(user_id, order_id, instance_id, callback, callback_type, payment_method, auth_key, message_name)
         print(payload)
         camunda_resp = requests.post(message_url, json=payload)
         if camunda_resp.status_code == 404:
