@@ -122,15 +122,15 @@ bookEventWorker.subscribe('release-event-ticket', async function({ task, taskSer
 
 /* Payment Request Received */
 bookEventWorker.subscribe('validate-payment-request', async function({ task, taskService }) {
-	let processVariables = new Variables();
 	let orderIDPymt = task.variables.get('order_id_pymt');
 	let callbackPymt = task.variables.get('callback_pymt');
 	let callbackPymtType = task.variables.get('callback_pymt_type');
 	let method = task.variables.get('payment_method');
 	let status = false, error = 'Request not validated';
+	let processVariables = new Variables();
 	if (orderIDPymt && callbackPymt && callbackPymtType && method) {
 		try {
-			let response = await instance.get(`${restUrl}/order/${order_id}`);
+			let response = await instance.get(`${restUrl}/order/${orderIDPymt}`);
 			status = true;
 			if (response.data.status === 'cancelled') {
 				status = false
@@ -149,24 +149,24 @@ bookEventWorker.subscribe('send-payment-request', async function({ task, taskSer
 	let processVariables = new Variables();
 	let method = task.variables.get('payment_method');
 	let order = task.variables.get('order');
-	let res = await beginPayment(method, order.total_price);
-	processVariables.set('payment_id', res.paymentId);
-	let loop = true;
-	while (loop) {
-		let res = await getPaymentEvents(res.paymentId);
-		if (res.lastEventId) {
-			let events = res.events;
-			processVariables.set('last_event_id', res.lastEventId);
-			if (events[0].type === 'OPEN_URL') {
-				processVariables.set('payment_type', 'url');
-				processVariables.set('payment_data', events[0].urlToOpen);
-			} else {
-				processVariables.set('payment_type', 'acc');
-				processVariables.set('payment_data', events[0].accountNumber);
-			}
-			loop = false;
-		}
-	}
+	// let res = await beginPayment(method, order.total_price);
+	// processVariables.set('payment_id', res.paymentId);
+	// let loop = true;
+	// while (loop) {
+	// 	let res = await getPaymentEvents(res.paymentId);
+	// 	if (res.lastEventId) {
+	// 		let events = res.events;
+	// 		processVariables.set('last_event_id', res.lastEventId);
+	// 		if (events[0].type === 'OPEN_URL') {
+	// 			processVariables.set('payment_type', 'url');
+	// 			processVariables.set('payment_data', events[0].urlToOpen);
+	// 		} else {
+	// 			processVariables.set('payment_type', 'acc');
+	// 			processVariables.set('payment_data', events[0].accountNumber);
+	// 		}
+	// 		loop = false;
+	// 	}
+	// }
 	console.log(`Did send-payment-request.`);
 	await taskService.complete(task, processVariables);
 });
@@ -183,21 +183,22 @@ bookEventWorker.subscribe('wait-payment', async function({ task, taskService }) 
 	let paymentId = task.variables.get('payment_id');
 	let loop = true;
 	let processVariables = new Variables();
-	while (loop) {
-		let res = await getPaymentEvents(paymentId, lastEventId);
-		let lastId = res.lastEventId;
-		let events = res.events;
-		if (events) {
-			let event = events.find(x => (x.paymentEventId === lastId));
-			if (event.type === 'SUCCESS') {
-				processVariables.set('paymentSuccess', true);
-				loop = false;
-			} else if (event.type === 'FAILURE') {
-				processVariables.set('paymentSuccess', false);
-				loop = false;
-			}
-		}
-	}
+	// while (loop) {
+	// 	let res = await getPaymentEvents(paymentId, lastEventId);
+	// 	let lastId = res.lastEventId;
+	// 	let events = res.events;
+	// 	if (events) {
+	// 		let event = events.find(x => (x.paymentEventId === lastId));
+	// 		if (event.type === 'SUCCESS') {
+	// 			processVariables.set('paymentSuccess', true);
+	// 			loop = false;
+	// 		} else if (event.type === 'FAILURE') {
+	// 			processVariables.set('paymentSuccess', false);
+	// 			loop = false;
+	// 		}
+	// 	}
+	// }
+	processVariables.set('paymentSuccess', true);
 	console.log(`Did wait-payment.`);
 	await taskService.complete(task, processVariables);
 });

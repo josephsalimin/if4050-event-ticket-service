@@ -1,20 +1,20 @@
 import json
 
 
-def build_payload(args_dict):
-    payload = {"variables": {}}
+def build_payload(args_dict, var="variables"):
+    payload = {var: {}}
     for key in args_dict.keys():
-        payload["variables"][key] = {}
+        payload[var][key] = {}
         if isinstance(args_dict[key], dict):
-            payload["variables"][key]["value"] = json.dumps(args_dict[key])
+            payload[var][key]["value"] = json.dumps(args_dict[key])
         elif isinstance(args_dict[key], list):
-            payload["variables"][key]["value"] = json.dumps(args_dict[key])
+            payload[var][key]["value"] = json.dumps(args_dict[key])
         else:
-            payload["variables"][key]["value"] = args_dict[key]
+            payload[var][key]["value"] = args_dict[key]
 
         if isinstance(args_dict[key], int):        
-            payload["variables"][key]["type"] = "Integer"
+            payload[var][key]["type"] = "Integer"
         else:
-            payload["variables"][key]["type"] = "String"
+            payload[var][key]["type"] = "String"
 
     return payload

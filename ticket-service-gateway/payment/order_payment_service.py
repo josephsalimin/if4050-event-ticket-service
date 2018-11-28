@@ -18,7 +18,7 @@ def create_request(user_id, order_id, instance_id, callback, callback_type, paym
         'callback_pymt_type': callback_type,
         'payment_method': payment_method
     }
-    payload = build_payload(payload)
+    payload = build_payload(payload, "processVariables")
     payload['processInstanceId'] = instance_id
     payload['messageName'] = message_name
     return payload
