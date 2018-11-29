@@ -183,21 +183,21 @@ bookEventWorker.subscribe('wait-payment', async function({ task, taskService }) 
 	let paymentId = task.variables.get('payment_id');
 	let loop = true;
 	let processVariables = new Variables();
-	// while (loop) {
-	// 	let res = await getPaymentEvents(paymentId, lastEventId);
-	// 	let lastId = res.lastEventId;
-	// 	let events = res.events;
-	// 	if (events) {
-	// 		let event = events.find(x => (x.paymentEventId === lastId));
-	// 		if (event.type === 'SUCCESS') {
-	// 			processVariables.set('paymentSuccess', true);
-	// 			loop = false;
-	// 		} else if (event.type === 'FAILURE') {
-	// 			processVariables.set('paymentSuccess', false);
-	// 			loop = false;
-	// 		}
-	// 	}
-	// }
+`	while (loop) {
+		let res = await getPaymentEvents(paymentId, lastEventId);
+		let lastId = res.lastEventId;
+		let events = res.events;
+		if (events) {
+			let event = events.find(x => (x.paymentEventId === lastId));
+			if (event.type === 'SUCCESS') {
+				processVariables.set('paymentSuccess', true);
+				loop = false;
+			} else if (event.type === 'FAILURE') {
+				processVariables.set('paymentSuccess', false);
+				loop = false;
+			}
+		}
+	}`
 	processVariables.set('paymentSuccess', true);
 	console.log(`Did wait-payment.`);
 	await taskService.complete(task, processVariables);
@@ -238,7 +238,12 @@ bookEventWorker.subscribe('notify-failed-booking', async function({ task, taskSe
 bookEventWorker.subscribe('notify-order-detail', async function({ task, taskService }) {
 	let callbackType = task.variables.get("callback_type");
 	let callback = task.variables.get("callback");
-	if (callbackType === 'url') {}
+	let order = task.variables.get("order");
+	if (callbackType === 'url') {
+		await axiosInstance.post(callback, {
+			"order": order 
+		});
+	}
 	console.log(`Did notify-order-detail.`);
 	await taskService.complete(task);
 });
@@ -261,6 +266,12 @@ bookEventWorker.subscribe('notify-booking-cancelled', async function({ task, tas
 bookEventWorker.subscribe('notify-payment-booking-success', async function({ task, taskService }) {
 	let callbackType = task.variables.get("callback_type");
 	let callback = task.variables.get("callback");
+	let order = task.variables.get("order");
+	if (callbackType === 'url') {
+		await axiosInstance.post(callback, {
+			"order": order 
+		});
+	}
 	console.log(`Did notify-payment-booking-success.`);
 	await taskService.complete(task);
 });
