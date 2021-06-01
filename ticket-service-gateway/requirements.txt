@@ -6,4 +6,4 @@ pytz==2018.7
 requests==2.20.1
 spyne==2.12.14
 suds-jurko==0.6
-urllib3==1.24.1
+urllib3==1.26.5
